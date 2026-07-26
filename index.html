@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZ Loan</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load Paystack Inline JS SDK -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="screen active">
+            <h1 class="logo">GenZ <span>Loan</span></h1>
+            <div class="card">
+                <h2 id="auth-title">Create Account</h2>
+                <form id="auth-form">
+                    <input type="text" id="fullname" placeholder="Full Name" required>
+                    <input type="email" id="email" placeholder="Email Address" required>
+                    <input type="tel" id="phone" value="+254" maxlength="13" pattern="^\+254[17][0-9]{8}$" title="Must start with +254 followed by 9 digits" required>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                    <button type="submit" class="btn primary">Sign Up</button>
+                </form>
+                <p>Already have an account? <a href="#" id="toggle-auth">Log In</a></p>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <header>
+                <h1 class="logo">GenZ <span>Loan</span></h1>
+                <button id="logout" class="btn secondary">Logout</button>
+            </header>
+            <div class="card dashboard-card">
+                <h2>Welcome, <span id="user-name">User</span>!</h2>
+                <div class="balance-box">
+                    <p>Approved Limit</p>
+                    <h3 id="limit-amount">KES 0</h3>
+                </div>
+                <button id="btn-apply" class="btn primary full-width">Apply for Loan</button>
+            </div>
+        </div>
+
+        <!-- Loan Application Form Screen -->
+        <div id="apply-screen" class="screen">
+            <header>
+                <h2>Loan Application</h2>
+                <button id="btn-cancel" class="btn secondary">Cancel</button>
+            </header>
+            <div class="card scrollable-form">
+                <form id="loan-form">
+                    <h3>1. Personal Details</h3>
+                    <label>National ID Number</label>
+                    <input type="number" placeholder="e.g. 12345678" required>
+                    <label>Current Physical Location / Estate</label>
+                    <input type="text" placeholder="e.g. Roysambu, Nairobi" required>
+                    
+                    <h3>2. Financial Status</h3>
+                    <label>Employment Status</label>
+                    <select required>
+                        <option value="employed">Employed (Salaried)</option>
+                        <option value="self-employed">Self-Employed / Business</option>
+                        <option value="student">Student</option>
+                        <option value="unemployed">Unemployed</option>
+                    </select>
+                    <label>Average Monthly Income (KES)</label>
+                    <input type="number" id="income" placeholder="e.g. 35000" required>
+                    <label>Monthly Rent / Living Expenses (KES)</label>
+                    <input type="number" id="expenses" placeholder="e.g. 15000" required>
+                    <label>Existing Loan Balances (Other apps/banks)</label>
+                    <input type="number" id="debt" placeholder="e.g. 5000" required>
+
+                    <h3>3. Emergency Contacts</h3>
+                    <p class="subtitle">Please provide 3 active contacts</p>
+                    
+                    <label>Contact 1: Relationship</label>
+                    <select required>
+                        <option value="mother">Mother</option>
+                        <option value="father">Father</option>
+                        <option value="spouse">Spouse</option>
+                        <option value="sibling">Sibling (Brother/Sister)</option>
+                    </select>
+                    <input type="tel" placeholder="Phone Number (e.g. 07XX XXX XXX)" required>
+
+                    <label>Contact 2: Relationship</label>
+                    <select required>
+                        <option value="brother">Brother</option>
+                        <option value="sister">Sister</option>
+                        <option value="friend">Close Friend</option>
+                        <option value="colleague">Work Colleague</option>
+                    </select>
+                    <input type="tel" placeholder="Phone Number (e.g. 07XX XXX XXX)" required>
+
+                    <label>Contact 3: Relationship</label>
+                    <select required>
+                        <option value="friend">Friend</option>
+                        <option value="parent">Parent</option>
+                        <option value="relative">Other Relative</option>
+                    </select>
+                    <input type="tel" placeholder="Phone Number (e.g. 07XX XXX XXX)" required>
+
+                    <button type="submit" class="btn primary">Continue to Face Verification</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Face Scan Screen -->
+        <div id="scan-screen" class="screen">
+            <header>
+                <h2>Identity Verification</h2>
+            </header>
+            <div class="card center-text">
+                <p>Please position your face within the frame for liveness detection.</p>
+                <div class="camera-container">
+                    <video id="camera-feed" autoplay playsinline muted></video>
+                    <div class="scanner-overlay"></div>
+                </div>
+                <h3 id="scan-instruction" class="scan-text">Initializing Camera...</h3>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="card center-text">
+                <h2>Application Successful!</h2>
+                <div class="qualification-circle">
+                    <p>You Qualify For</p>
+                    <h1 id="qualified-amount">KES 0</h1>
+                </div>
+                <p class="terms">Processing Fee: <strong>KES 200</strong> | Interest: 7.5%</p>
+                <button id="btn-pay-fee" class="btn primary">Pay KES 200 & Disburse Loan</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

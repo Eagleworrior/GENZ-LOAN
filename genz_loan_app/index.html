@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZ Loan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="screen active">
+            <h1 class="logo">GenZ <span>Loan</span></h1>
+            <div class="card">
+                <h2 id="auth-title">Create Account</h2>
+                <form id="auth-form">
+                    <input type="text" id="fullname" placeholder="Full Name" required>
+                    <input type="email" id="email" placeholder="Email Address" required>
+                    <!-- Updated Phone Input -->
+                    <input type="tel" id="phone" value="+254" maxlength="13" pattern="^\+254[17][0-9]{8}$" title="Must start with +254 followed by 9 digits" required>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                    <button type="submit" class="btn primary">Sign Up</button>
+                </form>
+                <p>Already have an account? <a href="#" id="toggle-auth">Log In</a></p>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <header>
+                <h1 class="logo">GenZ <span>Loan</span></h1>
+                <button id="logout" class="btn secondary">Logout</button>
+            </header>
+            <div class="card dashboard-card">
+                <h2>Welcome, <span id="user-name">User</span>!</h2>
+                <div class="balance-box">
+                    <p>Approved Limit</p>
+                    <h3 id="limit-amount">KES 0</h3>
+                </div>
+                <button id="btn-apply" class="btn primary full-width">Apply for Loan</button>
+            </div>
+        </div>
+
+        <!-- Loan Application Form Screen -->
+        <div id="apply-screen" class="screen">
+            <header>
+                <h2>Loan Application</h2>
+                <button id="btn-cancel" class="btn secondary">Cancel</button>
+            </header>
+            <div class="card">
+                <form id="loan-form">
+                    <label>National ID Number</label>
+                    <input type="number" placeholder="e.g. 12345678" required>
+                    
+                    <label>Employment Status</label>
+                    <select required>
+                        <option value="employed">Employed (Salaried)</option>
+                        <option value="self-employed">Self-Employed / Business</option>
+                        <option value="student">Student</option>
+                        <option value="unemployed">Unemployed</option>
+                    </select>
+
+                    <label>Average Monthly Income (KES)</label>
+                    <input type="number" id="income" placeholder="e.g. 35000" required>
+
+                    <label>Purpose of Loan</label>
+                    <select required>
+                        <option value="business">Business / Start-up</option>
+                        <option value="emergency">Medical / Emergency</option>
+                        <option value="school">Education / Fees</option>
+                        <option value="personal">Personal / Bills</option>
+                    </select>
+
+                    <label>Guarantor / Next of Kin Number</label>
+                    <input type="tel" placeholder="07XX XXX XXX" required>
+
+                    <button type="submit" class="btn primary">Calculate Qualification</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="card center-text">
+                <h2>Application Successful!</h2>
+                <div class="qualification-circle">
+                    <p>You Qualify For</p>
+                    <h1 id="qualified-amount">KES 0</h1>
+                </div>
+                <p class="terms">Interest rate: 7.5% | Repayment Period: 30 Days</p>
+                <button id="btn-accept" class="btn primary">Accept & Disburse</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
