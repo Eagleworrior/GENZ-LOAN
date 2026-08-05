@@ -100,7 +100,7 @@ document.getElementById('btn-pay-fee').addEventListener('click', () => {
     }
 
     let handler = PaystackPop.setup({
-        key: 'pk_live_b5a1b54f999a4097d760e17ba66a3ab9fc7c334d',
+        key: 'pk_live_d3ad28a96d0faa12c3c25a14389d29980a707d3b',
         email: userEmailValue,
         amount: 20000, // 200 KES in cents
         currency: 'KES',
