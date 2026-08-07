@@ -32,28 +32,41 @@
                 <h2 id="auth-title">Create Account</h2>
                 <form id="auth-form">
                     <div class="input-group">
-                        <i class="fa fa-user"></i>
+                        <i class="fa-solid fa-user-circle" style="color: var(--neon-blue)"></i>
                         <input type="text" id="fullname" placeholder="Full Name" required>
                     </div>
                     <div class="input-group">
-                        <i class="fa fa-envelope"></i>
+                        <i class="fa-solid fa-envelope-open-text" style="color: var(--neon-pink)"></i>
                         <input type="email" id="email" placeholder="Email Address" required>
                     </div>
                     <div class="input-group">
-                        <i class="fa fa-phone"></i>
-                        <input type="tel" id="phone" value="+254" maxlength="13" pattern="^\+254[17][0-9]{8}$" required>
+                        <i class="fa-solid fa-phone-volume" style="color: var(--neon-yellow)"></i>
+                        <input type="tel" id="phone" placeholder="Phone (e.g. +234...)" maxlength="16" pattern="^\+?[0-9]{7,15}$" required>
                     </div>
                     <div class="input-group">
-                        <i class="fa fa-lock"></i>
+                        <i class="fa-solid fa-coins" style="color: var(--accent-cyan)"></i>
+                        <select id="currency-select" required>
+                            <option value="KES" selected>Kenya (KES)</option>
+                            <option value="NGN">Nigeria (NGN)</option>
+                            <option value="GHS">Ghana (GHS)</option>
+                            <option value="ZAR">South Africa (ZAR)</option>
+                            <option value="USD">USA (USD)</option>
+                        </select>
+                    </div>
+                    <p class="input-hint" style="font-size: 0.65rem; color: var(--text-dim); margin: -10px 0 15px 5px; opacity: 0.8;">
+                        * Payments processed in KES/USD via international conversion.
+                    </p>
+                    <div class="input-group">
+                        <i class="fa-solid fa-key" style="color: var(--neon-orange)"></i>
                         <input type="password" id="password" placeholder="Create Password" required>
                     </div>
                     <div id="confirmation-fields">
                         <div class="input-group">
-                            <i class="fa fa-shield-halved"></i>
+                            <i class="fa-solid fa-shield-heart" style="color: var(--accent-emerald)"></i>
                             <input type="password" id="confirm-password" placeholder="Confirm Password" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn primary glow">Get Started <i class="fa fa-arrow-right"></i></button>
+                    <button type="submit" class="btn primary glow">Get Started <i class="fa-solid fa-rocket"></i></button>
                 </form>
                 <p class="toggle-text">Already have an account? <a href="#" id="toggle-auth">Log In</a></p>
             </div>
@@ -63,39 +76,39 @@
         <div id="dashboard-screen" class="screen">
             <header>
                 <div class="user-info">
-                    <div class="avatar"><i class="fa fa-user-astronaut"></i></div>
+                    <div class="avatar" style="background: var(--neon-pink); color: white;"><i class="fa-solid fa-user-ninja"></i></div>
                     <div>
-                        <p class="greeting">Hi, <span id="user-name">User</span></p>
-                        <p class="status">Account Verified</p>
+                        <p class="greeting" style="color: var(--neon-blue)">Hi, <span id="user-name">User</span></p>
+                        <p class="status" style="color: var(--primary)">Premium Account Verified</p>
                     </div>
                 </div>
-                <button id="logout" class="icon-btn"><i class="fa fa-sign-out-alt"></i></button>
+                <button id="logout" class="icon-btn" style="color: var(--neon-orange)"><i class="fa-solid fa-power-off"></i></button>
             </header>
 
             <div class="card balance-card">
-                <p>Available Loan Limit</p>
-                <h3 id="limit-amount">KES 0</h3>
+                <p style="color: white; opacity: 0.9;">Available Loan Limit</p>
+                <h3 id="limit-amount"><span class="currency">KES</span> 0</h3>
                 <div class="limit-footer">
-                    <span><i class="fa fa-shield-halved"></i> 100% Secure</span>
-                    <span><i class="fa fa-bolt"></i> Instant Payout</span>
+                    <span style="color: var(--neon-cyan)"><i class="fa-solid fa-shield-halved"></i> 100% Secure</span>
+                    <span style="color: var(--neon-yellow)"><i class="fa-solid fa-bolt-lightning"></i> Instant Payout</span>
                 </div>
             </div>
 
             <div class="quick-actions">
                 <button id="btn-apply" class="action-card">
-                    <i class="fa fa-money-bill-transfer"></i>
+                    <i class="fa-solid fa-money-bill-transfer"></i>
                     <span>Apply Loan</span>
                 </button>
                 <button id="btn-repay" class="action-card">
-                    <i class="fa fa-receipt"></i>
+                    <i class="fa-solid fa-receipt"></i>
                     <span>Repay</span>
                 </button>
                 <button id="btn-history" class="action-card">
-                    <i class="fa fa-history"></i>
+                    <i class="fa-solid fa-history"></i>
                     <span>History</span>
                 </button>
                 <button id="btn-refer" class="action-card">
-                    <i class="fa fa-users"></i>
+                    <i class="fa-solid fa-users"></i>
                     <span>Referral</span>
                 </button>
             </div>
@@ -104,7 +117,7 @@
         <!-- Loan Application Screen -->
         <div id="apply-screen" class="screen">
             <header>
-                <button class="back-btn" onclick="prevStep()"><i class="fa fa-chevron-left"></i></button>
+                <button class="back-btn" onclick="prevStep()"><i class="fa-solid fa-chevron-left"></i></button>
                 <h2>Premium Verification</h2>
             </header>
 
@@ -115,6 +128,7 @@
                 <div class="step"><span>4</span><p>Home</p></div>
                 <div class="step"><span>5</span><p>Finance</p></div>
                 <div class="step"><span>6</span><p>Contact</p></div>
+                <div class="step"><span>7</span><p>Payout</p></div>
             </div>
 
             <div class="card scrollable-form glass-v2">
@@ -122,19 +136,32 @@
                     <!-- Step 1: Identity -->
                     <div class="form-step" id="step-1">
                         <div class="form-section personal-info-section">
-                            <h3><i class="fa fa-id-card"></i> Identity Verification</h3>
-                            <p class="section-desc">We use secure 256-bit encryption to protect your ID data.</p>
+                            <h3 style="color: var(--neon-orange)"><i class="fa-solid fa-id-card-clip"></i> Identity Verification</h3>
+                            <p class="section-desc" style="color: rgba(255,255,255,0.7)">Secure 256-bit encryption for your protection.</p>
 
-                            <label class="decorated-label">National ID Number</label>
+                            <label class="decorated-label dob-label">National ID Number</label>
                             <div class="input-group">
-                                <i class="fa fa-hashtag"></i>
+                                <i class="fa-solid fa-fingerprint" style="color: var(--neon-orange)"></i>
                                 <input type="number" id="id-number" placeholder="Enter ID Number" required>
                             </div>
 
-                            <label class="decorated-label">Date of Birth</label>
-                            <div class="input-group">
-                                <i class="fa fa-calendar-day"></i>
-                                <input type="date" id="dob" required>
+                            <label class="decorated-label dob-label">Date of Birth</label>
+                            <div class="manual-date-group">
+                                <select id="dob-day" required>
+                                    <option value="" disabled selected>Day</option>
+                                    <!-- Days 1-31 will be injected by JS or hardcoded -->
+                                </select>
+                                <select id="dob-month" required>
+                                    <option value="" disabled selected>Month</option>
+                                    <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
+                                    <option value="04">Apr</option><option value="05">May</option><option value="06">Jun</option>
+                                    <option value="07">Jul</option><option value="08">Aug</option><option value="09">Sep</option>
+                                    <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+                                </select>
+                                <select id="dob-year" required>
+                                    <option value="" disabled selected>Year</option>
+                                    <!-- Years will be injected by JS -->
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -142,18 +169,18 @@
                     <!-- Step 2: Employment & Income -->
                     <div class="form-step" id="step-2">
                         <div class="form-section income-section">
-                            <h3><i class="fa fa-money-bill-trend-up"></i> Income Details</h3>
-                            <p class="section-desc">Provide accurate details to unlock a higher limit.</p>
+                            <h3 style="color: var(--neon-blue)"><i class="fa-solid fa-chart-line"></i> Income Details</h3>
+                            <p class="section-desc">Unlock higher limits with accurate data.</p>
 
-                            <label class="decorated-label">Average Monthly Income (KES)</label>
+                            <label class="decorated-label" style="color: var(--neon-blue)">Average Monthly Income</label>
                             <div class="input-group">
-                                <i class="fa fa-wallet"></i>
-                                <input type="number" id="income" placeholder="e.g. 75,000" required>
+                                <i class="fa-solid fa-sack-dollar" style="color: var(--neon-blue)"></i>
+                                <input type="number" id="income" placeholder="Enter Amount" required>
                             </div>
 
                             <label class="decorated-label">Employment Status</label>
                             <div class="input-group">
-                                <i class="fa fa-briefcase"></i>
+                                <i class="fa-solid fa-briefcase"></i>
                                 <select id="employment-status" required>
                                     <option value="" disabled selected>Select Status</option>
                                     <option value="employed">Employed (Salaried)</option>
@@ -168,24 +195,24 @@
                     <!-- Step 3: Professional Details -->
                     <div class="form-step" id="step-3">
                         <div class="form-section professional-section">
-                            <h3><i class="fa fa-user-tie"></i> Professional Profile</h3>
+                            <h3><i class="fa-solid fa-user-tie"></i> Professional Profile</h3>
                             <p class="section-desc">Tell us more about your career.</p>
 
                             <label class="decorated-label">Current Employer / Business Name</label>
                             <div class="input-group">
-                                <i class="fa fa-building"></i>
+                                <i class="fa-solid fa-building"></i>
                                 <input type="text" id="employer" placeholder="e.g. Google Kenya" required>
                             </div>
 
                             <label class="decorated-label">Job Title / Role</label>
                             <div class="input-group">
-                                <i class="fa fa-user-tag"></i>
+                                <i class="fa-solid fa-user-tag"></i>
                                 <input type="text" id="job-title" placeholder="e.g. Software Engineer" required>
                             </div>
 
                             <label class="decorated-label">Work Experience (Years)</label>
                             <div class="input-group">
-                                <i class="fa fa-clock-rotate-left"></i>
+                                <i class="fa-solid fa-clock-rotate-left"></i>
                                 <input type="number" id="experience" placeholder="e.g. 3" required>
                             </div>
                         </div>
@@ -194,24 +221,24 @@
                     <!-- Step 4: Residential Info -->
                     <div class="form-step" id="step-4">
                         <div class="form-section residential-section">
-                            <h3><i class="fa fa-house-chimney"></i> Residential Address</h3>
+                            <h3><i class="fa-solid fa-house-chimney"></i> Residential Address</h3>
                             <p class="section-desc">Current place of residence.</p>
 
                             <label class="decorated-label">Current City / Town</label>
                             <div class="input-group">
-                                <i class="fa fa-map-location-dot"></i>
+                                <i class="fa-solid fa-map-location-dot"></i>
                                 <input type="text" id="city" placeholder="e.g. Nairobi" required>
                             </div>
 
                             <label class="decorated-label">Residential Area / Estate</label>
                             <div class="input-group">
-                                <i class="fa fa-location-dot"></i>
+                                <i class="fa-solid fa-location-dot"></i>
                                 <input type="text" id="estate" placeholder="e.g. Kilimani" required>
                             </div>
 
                             <label class="decorated-label">Residence Type</label>
                             <div class="input-group">
-                                <i class="fa fa-house-user"></i>
+                                <i class="fa-solid fa-house-user"></i>
                                 <select id="residence-type" required>
                                     <option value="" disabled selected>Select Type</option>
                                     <option value="owned">Owned Home</option>
@@ -226,24 +253,24 @@
                     <!-- Step 5: Financial Obligations -->
                     <div class="form-step" id="step-5">
                         <div class="form-section financial-section">
-                            <h3><i class="fa fa-sack-dollar"></i> Financial Commitments</h3>
-                            <p class="section-desc">This helps us ensure responsible lending.</p>
+                            <h3 style="color: var(--neon-yellow)"><i class="fa-solid fa-piggy-bank"></i> Financial Commitments</h3>
+                            <p class="section-desc">Responsible lending for your future.</p>
 
-                            <label class="decorated-label">Monthly Expenses (KES)</label>
+                            <label class="decorated-label" style="color: var(--neon-yellow)">Monthly Expenses</label>
                             <div class="input-group">
-                                <i class="fa fa-cart-shopping"></i>
-                                <input type="number" id="expenses" placeholder="e.g. 30,000" required>
+                                <i class="fa-solid fa-receipt" style="color: var(--neon-yellow)"></i>
+                                <input type="number" id="expenses" placeholder="Enter Amount" required>
                             </div>
 
-                            <label class="decorated-label">Outstanding Loans (KES)</label>
+                            <label class="decorated-label">Outstanding Loans</label>
                             <div class="input-group">
-                                <i class="fa fa-hand-holding-dollar"></i>
-                                <input type="number" id="existing-loans" placeholder="e.g. 10,000" required>
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                                <input type="number" id="existing-loans" placeholder="Enter Amount" required>
                             </div>
 
                             <label class="decorated-label">Bank Name</label>
                             <div class="input-group">
-                                <i class="fa fa-university"></i>
+                                <i class="fa-solid fa-university"></i>
                                 <input type="text" id="bank-name" placeholder="e.g. KCB Bank" required>
                             </div>
                         </div>
@@ -252,7 +279,7 @@
                     <!-- Step 6: Emergency Contacts -->
                     <div class="form-step" id="step-6">
                         <div class="form-section contacts-section">
-                            <h3><i class="fa fa-users-viewfinder"></i> Emergency Verification</h3>
+                            <h3><i class="fa-solid fa-users-viewfinder"></i> Emergency Verification</h3>
                             <p class="section-desc">Provide contacts for quick verification.</p>
 
                             <div class="contact-entry">
@@ -271,7 +298,7 @@
                                     </div>
                                 </div>
                                 <div class="input-group">
-                                    <i class="fa fa-phone"></i>
+                                    <i class="fa-solid fa-phone"></i>
                                     <input type="tel" placeholder="Phone Number" required>
                                 </div>
                             </div>
@@ -291,19 +318,56 @@
                                     </div>
                                 </div>
                                 <div class="input-group">
-                                    <i class="fa fa-phone"></i>
+                                    <i class="fa-solid fa-phone"></i>
                                     <input type="tel" placeholder="Phone Number" required>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Step 7: Payout Destination -->
+                    <div class="form-step" id="step-7">
+                        <div class="form-section payout-section">
+                            <h3 style="color: var(--accent-purple)"><i class="fa-solid fa-building-columns"></i> Payout Destination</h3>
+                            <p class="section-desc">Select where you want to receive your funds.</p>
+
+                            <label class="decorated-label" style="color: var(--accent-purple)">Receive via</label>
+                            <div class="payout-toggle-group">
+                                <label class="payout-option">
+                                    <input type="radio" name="payout-method" value="mobile" checked>
+                                    <span class="payout-box"><i class="fa-solid fa-mobile-screen"></i> Mobile Money</span>
+                                </label>
+                                <label class="payout-option">
+                                    <input type="radio" name="payout-method" value="bank">
+                                    <span class="payout-box"><i class="fa-solid fa-landmark"></i> Bank Account</span>
+                                </label>
+                            </div>
+
+                            <div id="bank-details-fields" style="display: none; margin-top: 20px;">
+                                <label class="decorated-label">Select Bank Name</label>
+                                <div class="input-group">
+                                    <i class="fa-solid fa-search" style="color: var(--accent-cyan)"></i>
+                                    <input type="text" id="bank-name-input" list="bank-list" placeholder="Search Bank..." required>
+                                    <datalist id="bank-list">
+                                        <!-- Will be populated by JS -->
+                                    </datalist>
+                                </div>
+
+                                <label class="decorated-label">Account Number</label>
+                                <div class="input-group">
+                                    <i class="fa-solid fa-hashtag" style="color: var(--accent-emerald)"></i>
+                                    <input type="number" id="account-number" placeholder="Enter Account Number" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="info-alert">
-                        <i class="fa fa-circle-check"></i>
+                        <i class="fa-solid fa-circle-check"></i>
                         <p>Your information is safe and will never be shared.</p>
                     </div>
 
-                    <button type="submit" class="btn primary glow">Next Step <i class="fa fa-arrow-right"></i></button>
+                    <button type="button" id="next-step-btn" class="btn primary glow" onclick="nextStep()">Next Step <i class="fa-solid fa-arrow-right"></i></button>
                 </form>
             </div>
         </div>
@@ -326,19 +390,19 @@
                 <div class="confetti-holder"></div>
                 <div id="captured-photo-container" class="verified-badge">
                     <img id="captured-photo">
-                    <div class="check-icon"><i class="fa fa-check"></i></div>
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
                 </div>
                 <h2>Loan Approved!</h2>
-                <h1 id="qualified-amount">KES 0</h1>
-                <p class="fee-text">Processing Fee: KES 200</p>
-                <button id="btn-pay-fee" class="btn primary glow">Disburse Now <i class="fa fa-paper-plane"></i></button>
+                <h1 id="qualified-amount"><span class="currency">KES</span> 0</h1>
+                <p class="fee-text">Processing Fee: <span class="currency">KES</span> 500</p>
+                <button id="btn-pay-fee" class="btn primary glow">Disburse Now <i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
 
         <!-- History Screen -->
         <div id="history-screen" class="screen">
             <header>
-                <button class="back-btn" onclick="showScreen('dashboard-screen')"><i class="fa fa-chevron-left"></i></button>
+                <button class="back-btn" onclick="showScreen('dashboard-screen')"><i class="fa-solid fa-chevron-left"></i></button>
                 <h2>Transaction History</h2>
             </header>
             <div id="history-list" class="list-container">
@@ -350,16 +414,16 @@
         <!-- Referral Screen -->
         <div id="refer-screen" class="screen">
             <header>
-                <button class="back-btn" onclick="showScreen('dashboard-screen')"><i class="fa fa-chevron-left"></i></button>
+                <button class="back-btn" onclick="showScreen('dashboard-screen')"><i class="fa-solid fa-chevron-left"></i></button>
                 <h2>Refer & Earn</h2>
             </header>
             <div class="card center-text">
-                <div class="refer-icon"><i class="fa fa-gift"></i></div>
+                <div class="refer-icon"><i class="fa-solid fa-gift"></i></div>
                 <h3>Share the wealth!</h3>
-                <p>Get KES 50 bonus for every friend who completes their first loan.</p>
-                <div class="referral-box">
-                    <code id="referral-code">GENZ-XXXX</code>
-                    <button onclick="copyReferral()"><i class="fa fa-copy"></i></button>
+                <p>Get a bonus for every friend who completes their first loan.</p>
+                <div class="referral-box" style="border-color: var(--neon-yellow)">
+                    <code id="referral-code" style="color: var(--neon-yellow)">GENZ-XXXX</code>
+                    <button onclick="copyReferral()" style="color: var(--neon-pink)"><i class="fa-solid fa-clone"></i></button>
                 </div>
                 <button class="btn primary" id="share-referral">Share with Friends</button>
             </div>

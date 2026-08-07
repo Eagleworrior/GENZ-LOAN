@@ -1,7 +1,7 @@
-# Tasks - Enhancing GenZ Loan App Experience
+# Tasks - Fixing Date Picker and Icons
 
-- [x] Update `app.js` logic
-- [x] Restructure `index.html`
-- [x] Enhance `style.css`
-- [x] Verify changes
+- [x] Update `index.html` icons and DOB field
+- [x] Fix `style.css` icon rendering and date input styling
+- [x] Add DOB validation in `app.js`
+- [x] Verify fixes
 - [x] Create walkthrough artifact
