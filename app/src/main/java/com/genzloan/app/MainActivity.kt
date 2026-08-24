@@ -22,16 +22,26 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         
         webView = WebView(this)
+        webView.setBackgroundColor(android.graphics.Color.parseColor("#0f0c29")) // Match bg-dark
         setContentView(webView)
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
+        webView.settings.databaseEnabled = true
         webView.settings.allowFileAccess = true
         webView.settings.allowContentAccess = true
+        webView.settings.loadWithOverviewMode = true
+        webView.settings.useWideViewPort = true
         webView.settings.mediaPlaybackRequiresUserGesture = false
         webView.settings.javaScriptCanOpenWindowsAutomatically = true
+        webView.settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
-        webView.webViewClient = WebViewClient()
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // Page loaded successfully
+            }
+        }
         
         webView.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest) {

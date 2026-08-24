@@ -1,0 +1,7 @@
+- `[x]` Create high-end Splash Screen UI in `index.html`
+- `[x]` Create strict Offline Screen UI in `index.html`
+- `[x]` Style Splash and Offline screens with neon animations in `style.css`
+- `[x]` Implement connectivity monitoring logic in `app.js`
+- `[x]` Implement startup sequence (Splash -> Connectivity Check) in `app.js`
+- `[x]` Replace `alert()` calls with `showToast()` in connectivity logic
+- `[x]` Synchronize all changes and verify offline transitions

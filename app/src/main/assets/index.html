@@ -24,7 +24,38 @@
     <!-- Animated Background Layer -->
     <div class="bg-animation"></div>
 
+    <!-- Splash Screen Layer -->
+    <div id="splash-screen">
+        <div class="splash-content">
+            <h1 class="logo splash-logo">GenZ <span>Loan</span></h1>
+            <div class="premium-loader">
+                <div class="loader-ring"></div>
+                <div class="loader-ring"></div>
+                <div class="loader-ring"></div>
+                <div class="loader-text">Initializing Secure Core...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline Screen Layer -->
+    <div id="offline-screen">
+        <div class="card offline-card center-text">
+            <div class="offline-icon">
+                <i class="fa-solid fa-wifi-slash"></i>
+            </div>
+            <h2 style="color: var(--neon-pink)">Connection Lost</h2>
+            <p style="color: var(--text-dim); margin-bottom: 25px;">
+                GenZ Loan requires a secure internet connection to process disbursements and protect your data.
+            </p>
+            <button onclick="checkConnectivity(true)" class="btn primary glow">
+                <i class="fa-solid fa-rotate-right"></i> Retry Connection
+            </button>
+        </div>
+    </div>
+
     <div id="app">
+        <div id="toast-container"></div>
+
         <!-- Auth Screen -->
         <div id="auth-screen" class="screen active">
             <h1 class="logo">GenZ <span>Loan</span></h1>
@@ -41,16 +72,12 @@
                     </div>
                     <div class="input-group">
                         <i class="fa-solid fa-phone-volume" style="color: var(--neon-yellow)"></i>
-                        <input type="tel" id="phone" placeholder="Phone (e.g. +234...)" maxlength="16" pattern="^\+?[0-9]{7,15}$" required>
+                        <input type="tel" id="phone" placeholder="Phone Number" maxlength="20" required>
                     </div>
                     <div class="input-group">
-                        <i class="fa-solid fa-coins" style="color: var(--accent-cyan)"></i>
-                        <select id="currency-select" required>
-                            <option value="KES" selected>Kenya (KES)</option>
-                            <option value="NGN">Nigeria (NGN)</option>
-                            <option value="GHS">Ghana (GHS)</option>
-                            <option value="ZAR">South Africa (ZAR)</option>
-                            <option value="USD">USA (USD)</option>
+                        <i class="fa-solid fa-earth-africa" style="color: var(--accent-cyan)"></i>
+                        <select id="country-select" required>
+                            <!-- Populated by JS -->
                         </select>
                     </div>
                     <p class="input-hint" style="font-size: 0.65rem; color: var(--text-dim); margin: -10px 0 15px 5px; opacity: 0.8;">
@@ -282,7 +309,7 @@
                             <h3><i class="fa-solid fa-users-viewfinder"></i> Emergency Verification</h3>
                             <p class="section-desc">Provide contacts for quick verification.</p>
 
-                            <div class="contact-entry">
+                                <div class="contact-entry">
                                 <label class="decorated-label">Contact 1: Primary Relative</label>
                                 <div class="input-row">
                                     <div class="input-group small">
@@ -291,15 +318,20 @@
                                             <option value="mother">Mom</option>
                                             <option value="father">Dad</option>
                                             <option value="spouse">Spouse</option>
+                                            <option value="brother">Brother</option>
+                                            <option value="sister">Sister</option>
+                                            <option value="friend">Friend</option>
+                                            <option value="guardian">Guardian</option>
+                                            <option value="colleague">Colleague</option>
                                         </select>
                                     </div>
                                     <div class="input-group flex-2">
-                                        <input type="text" placeholder="Full Name" required>
+                                        <input type="text" class="contact-name" placeholder="Full Name" required>
                                     </div>
                                 </div>
                                 <div class="input-group">
                                     <i class="fa-solid fa-phone"></i>
-                                    <input type="tel" placeholder="Phone Number" required>
+                                    <input type="tel" class="contact-phone" placeholder="Phone Number" required>
                                 </div>
                             </div>
 
@@ -309,17 +341,49 @@
                                     <div class="input-group small">
                                         <select class="rel-select" required>
                                             <option value="" disabled selected>Rel.</option>
-                                            <option value="brother">Bro</option>
-                                            <option value="sister">Sis</option>
+                                            <option value="mother">Mom</option>
+                                            <option value="father">Dad</option>
+                                            <option value="spouse">Spouse</option>
+                                            <option value="brother">Brother</option>
+                                            <option value="sister">Sister</option>
+                                            <option value="friend">Friend</option>
+                                            <option value="guardian">Guardian</option>
+                                            <option value="colleague">Colleague</option>
                                         </select>
                                     </div>
                                     <div class="input-group flex-2">
-                                        <input type="text" placeholder="Full Name" required>
+                                        <input type="text" class="contact-name" placeholder="Full Name" required>
                                     </div>
                                 </div>
                                 <div class="input-group">
                                     <i class="fa-solid fa-phone"></i>
-                                    <input type="tel" placeholder="Phone Number" required>
+                                    <input type="tel" class="contact-phone" placeholder="Phone Number" required>
+                                </div>
+                            </div>
+
+                            <div class="contact-entry">
+                                <label class="decorated-label">Contact 3: Tertiary Relative / Friend</label>
+                                <div class="input-row">
+                                    <div class="input-group small">
+                                        <select class="rel-select" required>
+                                            <option value="" disabled selected>Rel.</option>
+                                            <option value="mother">Mom</option>
+                                            <option value="father">Dad</option>
+                                            <option value="spouse">Spouse</option>
+                                            <option value="brother">Brother</option>
+                                            <option value="sister">Sister</option>
+                                            <option value="friend">Friend</option>
+                                            <option value="guardian">Guardian</option>
+                                            <option value="colleague">Colleague</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group flex-2">
+                                        <input type="text" class="contact-name" placeholder="Full Name" required>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <input type="tel" class="contact-phone" placeholder="Phone Number" required>
                                 </div>
                             </div>
                         </div>
@@ -344,13 +408,19 @@
                             </div>
 
                             <div id="bank-details-fields" style="display: none; margin-top: 20px;">
-                                <label class="decorated-label">Select Bank Name</label>
+                                <label class="decorated-label">Bank Name</label>
                                 <div class="input-group">
-                                    <i class="fa-solid fa-search" style="color: var(--accent-cyan)"></i>
-                                    <input type="text" id="bank-name-input" list="bank-list" placeholder="Search Bank..." required>
+                                    <i class="fa-solid fa-building-columns" style="color: var(--accent-cyan)"></i>
+                                    <input type="text" id="bank-name-input" list="bank-list" placeholder="Search or Type Bank Name..." required>
                                     <datalist id="bank-list">
                                         <!-- Will be populated by JS -->
                                     </datalist>
+                                </div>
+
+                                <label class="decorated-label">Account Holder Name</label>
+                                <div class="input-group">
+                                    <i class="fa-solid fa-user-check" style="color: var(--neon-blue)"></i>
+                                    <input type="text" id="acc-name" placeholder="Full Legal Name" required>
                                 </div>
 
                                 <label class="decorated-label">Account Number</label>
@@ -384,6 +454,58 @@
             </div>
         </div>
 
+        <!-- Agreement Screen -->
+        <div id="agreement-screen" class="screen">
+            <div class="card agreement-card">
+                <div class="center-text">
+                    <i class="fa-solid fa-file-contract agreement-icon"></i>
+                    <h2 style="color: var(--neon-cyan)">Loan Agreement</h2>
+                    <p style="color: var(--text-dim); font-size: 0.8rem;">Please review your loan terms carefully.</p>
+                </div>
+
+                <div class="terms-container">
+                    <div class="term-row">
+                        <span>Loan Amount</span>
+                        <b id="agree-principal" style="color: var(--text-main)">-</b>
+                    </div>
+                    <div class="term-row">
+                        <span>Interest Rate</span>
+                        <b id="agree-interest" style="color: var(--neon-yellow)">-</b>
+                    </div>
+                    <div class="term-row">
+                        <span>Repayment Period</span>
+                        <b id="agree-period" style="color: var(--neon-orange)">-</b>
+                    </div>
+                    <div class="term-row">
+                        <span>Processing Fee (Equivalent)</span>
+                        <b id="agree-fee" style="color: var(--accent-gold)">-</b>
+                    </div>
+                    <div class="term-row highlight">
+                        <span>Total Repayment</span>
+                        <b id="agree-total" style="color: var(--primary)">-</b>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 15px 0;">
+
+                    <div class="payout-summary">
+                        <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 5px;">Payout Destination:</p>
+                        <div class="account-badge">
+                            <i class="fa-solid fa-university"></i>
+                            <div>
+                                <p id="agree-bank" style="margin:0; font-weight:bold;">-</p>
+                                <p id="agree-acc-name" style="margin:0; font-size: 0.7rem; opacity: 0.8;">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agreement-footer">
+                    <button id="btn-approve-terms" class="btn primary glow">I Agree & Continue</button>
+                    <button id="btn-decline-terms" class="btn-outline" style="width: 100%; margin-top: 10px;">Decline</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Result Screen -->
         <div id="result-screen" class="screen">
             <div class="card center-text success-card">
@@ -394,7 +516,7 @@
                 </div>
                 <h2>Loan Approved!</h2>
                 <h1 id="qualified-amount"><span class="currency">KES</span> 0</h1>
-                <p class="fee-text">Processing Fee: <span class="currency">KES</span> 500</p>
+                <p class="fee-text">Processing Fee: <span class="currency">KES</span> <span id="dynamic-fee">500</span></p>
                 <button id="btn-pay-fee" class="btn primary glow">Disburse Now <i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
