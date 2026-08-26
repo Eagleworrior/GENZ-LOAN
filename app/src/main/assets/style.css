@@ -418,6 +418,25 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 /* Success UI */
 .verified-badge { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
 .verified-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); }
+
+.approved-overlay {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    padding: 2px 12px;
+    border-radius: 20px;
+    z-index: 10;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
 .check-icon { position: absolute; bottom: 0; right: 0; background: var(--primary); color: var(--bg-dark); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 3px solid var(--bg-dark); }
 
 /* Scan UI V2 */
