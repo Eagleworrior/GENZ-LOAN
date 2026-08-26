@@ -1,50 +1,47 @@
-# Implementation Plan - Advanced Intelligence, Security & UX Overhaul
+# Implementation Plan - UI Refinement & Human Detail Biometrics
 
-This plan upgrades the GenZ Loan app with high-intelligence biometric verification, strict connectivity enforcement, a professional terms gateway, and a robust application resume system.
+This plan refines the navigation layout and implements a professional "Human Detail Detector" for biometrics, ensuring the app distinguishes between a real person and an empty/covered lens.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Intelligent Biometrics**: The face scan will now actively verify image clarity using canvas analysis. It will guide the user through a 3-point capture (Center, Left, Right) and will *refuse* to capture if the environment is too dark or the image is blurry.
->
-> **Strict Continuity**: All application progress will be saved in real-time. If a user closes the app at Step 4, they will return exactly to Step 4 with their data preserved and "locked" for that session.
->
-> **Forced Online State**: To protect financial integrity, the app will monitor the connection every second. If the internet drops, the UI will be instantly replaced by a "No Connection" lock screen.
+> **Human Detail Detection**: To ensure the app only captures real people (regardless of skin tone):
+> 1. We will implement **Variance Analysis**: The app will check for "Visual Detail" (eyes, facial features, contrast). A black screen or a covered lens has "Zero Detail" and will be rejected.
+> 2. **Anti-Blur Logic**: The app will wait for the image to be stable. If the user is moving too fast or the camera is shaking, it will show: *"Hold still for verification"*.
+
+> [!TIP]
+> **Vertical Navigation**: The Home button will be moved **directly above** the Back button in a vertical column. I will also add the Home button to the "Loan Approved" and "Loan Agreement" screens so users can always go back to the main menu.
 
 ## Proposed Changes
 
 ### [UI / UX Components]
 
 #### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
-- **Home Navigation**: Add a "Home" icon button (`fa-house`) in the header of all application steps.
-- **Terms Gateway**: Refine the Terms screen to be the first mandatory stop for new users.
-- **Advanced Scan UI**: Enhance the `#scan-screen` with clear indicators for "Front, Left, Right" stages and a clarity meter.
-- **Mobile Payout**: Add an editable phone input in Step 7 that defaults to the user's registration number.
+- **Navigation Stack**: Wrap Home and Back buttons in a `.nav-stack` container in the `apply-screen`.
+- **Global Home Access**: Add a header with the Home button to the `result-screen` and `agreement-screen`.
 
 #### [MODIFY] [style.css](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/style.css)
-- **Centered Toasts**: Update toast styles to be perfectly centered with a professional neon-pink/green glow.
-- **Home Menu Button**: Style the new navigation button for a glassmorphism feel.
-- **Biometric Lenses**: Add "Digital Lens" overlays and scanning animations for the camera.
+- Create `.nav-stack` class: `display: flex; flex-direction: column; gap: 8px;`.
+- Add a new "Lens Pulse" animation: The scanner will glow **Blue** when it detects a human face and **Orange** when it sees nothing.
 
-### [Core Logic & Brain]
+### [Core Logic & Biometrics]
 
 #### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- **Resume System**:
-    - Save `currentUser.loanStep` and `currentUser.loanFormData` to `localStorage` on every "Next" click.
-    - Update `showScreen('apply-screen')` to automatically load the last saved step.
-- **Smart Connectivity**:
-    - Implement a `setInterval` that force-checks `navigator.onLine` every 1000ms.
-- **Clarity-Driven Scan**:
-    - Use a hidden canvas to analyze pixel brightness and variance before allowing a capture.
-    - Implement the guided "Turn Left/Right" logic with mandatory clarity thresholds.
-- **Anti-Spam Toasts**:
-    - Implement a cooldown/duplicate check in `showToast` to prevent multiple messages from appearing simultaneously.
+- **Refined Clarity Engine**:
+    - **Detail Check**: Analyze the "Pixel Variance" to ensure a human face is actually in front of the camera.
+    - **No-Capture Zone**: If the camera is covered (black screen), it will show *"Center face in the lens"* and stay locked.
+    - Capture will only trigger when high detail and stability are detected.
+
+### [Build & Delivery]
+
+#### [Task] [APK Update]
+- Increment version to **1.3.1**.
+- Regenerate the signed APK and deliver to the Downloads folder as **"Genz loan.apk"**.
 
 ## Verification Plan
 
 ### Manual Verification
-1. **Resume Test**: Start a loan, reach Step 3, go to Home, click Apply again. Verify you land on Step 3 with data intact.
-2. **Clarity Test**: Try to perform a face scan in a completely dark room or with the camera covered. Verify the app waits for a clear face.
-3. **Spam Test**: Repeatedly click "Next" on an empty field and verify only ONE centered toast appears.
-4. **Offline Test**: Disable Wi-Fi. Verify the app locks instantly and cannot be used until the connection is restored.
-5. **Payout Test**: Verify the mobile payout field shows your signup number but allows editing.
+1. **Vertical Nav**: Verify Home is on top of Back in all application screens.
+2. **Human Detail Test**: Point the camera at a wall or cover it with your thumb. Verify it **refuses** to capture.
+3. **Real Face Test**: Point the camera at a person. Verify the "Clarity Bar" fills up and captures normally.
+4. **Dispersal Page**: Verify the Home button is available after the loan is approved.

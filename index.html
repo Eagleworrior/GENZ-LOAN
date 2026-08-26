@@ -189,9 +189,9 @@
         <!-- Loan Application Screen -->
         <div id="apply-screen" class="screen">
             <header>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <button class="back-btn" onclick="prevStep()"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="nav-stack">
                     <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
+                    <button class="back-btn" onclick="prevStep()"><i class="fa-solid fa-chevron-left"></i></button>
                 </div>
                 <h2>Premium Verification</h2>
             </header>
@@ -556,10 +556,15 @@
 
         <!-- Agreement Screen -->
         <div id="agreement-screen" class="screen">
+            <header>
+                <div class="nav-stack">
+                    <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
+                </div>
+                <h2 style="color: var(--neon-cyan)">Agreement</h2>
+            </header>
             <div class="card agreement-card">
                 <div class="center-text">
                     <i class="fa-solid fa-file-contract agreement-icon"></i>
-                    <h2 style="color: var(--neon-cyan)">Loan Agreement</h2>
                     <p style="color: var(--text-dim); font-size: 0.8rem;">Please review your loan terms carefully.</p>
                 </div>
 
@@ -608,6 +613,12 @@
 
         <!-- Result Screen -->
         <div id="result-screen" class="screen">
+            <header>
+                <div class="nav-stack">
+                    <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
+                </div>
+                <h2 style="color: var(--primary)">Approved</h2>
+            </header>
             <div class="card center-text success-card">
                 <div class="confetti-holder"></div>
                 <div id="captured-photo-container" class="verified-badge">

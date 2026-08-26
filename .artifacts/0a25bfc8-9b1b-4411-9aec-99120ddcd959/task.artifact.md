@@ -1,10 +1,7 @@
-- `[x]` Update `index.html` with Home button, advanced scan UI, and mobile payout field
-- `[x]` Style centered toasts, biometric lenses, and home button in `style.css`
-- `[x]` Implement real-time application "Pause & Resume" logic in `app.js`
-- `[x]` Implement High-Brain "Clarity-Driven" multi-angle face scan in `app.js`
-- `[x]` Implement anti-spam logic for centered neon notifications in `app.js`
-- `[x]` Harden connectivity guard to be strictly "Always-Online"
-- `[x]` Run `:app:assembleRelease` Gradle build (Version 1.3.0)
-- `[x]` Locate generated `app-release.apk`
-- `[x]` Rename to "Genz loan.apk" and move to Downloads
-- `[x]` Final Verification of APK presence
+- `[ ]` Implement vertical navigation stack in `index.html` and `style.css`
+- `[ ]` Add Home button to `result-screen` and `agreement-screen`
+- `[ ]` Implement "Human Detail" (Variance Analysis) in `app.js` for face scan
+- `[ ]` Ensure biometric scan blocks covered/black lenses but allows all skin tones
+- `[ ]` Sync `app.js` and `index.html` to root and assets
+- `[ ]` Increment version to 1.3.1 and build signed APK
+- `[ ]` Final Verification and Delivery

@@ -546,9 +546,17 @@ select option { background: var(--bg-light); color: white; }
 .toggle-text a { color: var(--primary); text-decoration: none; font-weight: 600; }
 .back-btn, .icon-btn { background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer; }
 
+.nav-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-right: 15px;
+}
+
 .home-btn {
     background: rgba(0, 210, 255, 0.1) !important;
-    width: 40px; height: 40px;
+    width: 38px; height: 38px;
     border-radius: 12px !important;
     display: flex !important;
     align-items: center; justify-content: center;
@@ -556,7 +564,7 @@ select option { background: var(--bg-light); color: white; }
     box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
 }
 
-.home-btn i { font-size: 1.1rem; }
+.home-btn i { font-size: 1rem; }
 
 
 /* Toast Notification System - Centered & Fixed */

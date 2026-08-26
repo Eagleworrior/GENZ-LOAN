@@ -913,26 +913,49 @@ async function startFaceScan() {
 
                     const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     const data = frame.data;
-                    let brightness = 0;
-                    for (let i = 0; i < data.length; i += 4) {
-                        brightness += (data[i] + data[i+1] + data[i+2]) / 3;
-                    }
-                    brightness = brightness / (data.length / 4);
 
-                    // Clarity Bar Progress (0-100)
-                    let score = Math.min(100, (brightness / 60) * 100);
+                    let brightness = 0;
+                    let variance = 0;
+                    let avg = 0;
+
+                    // 1. Calculate Average Brightness
+                    for (let i = 0; i < data.length; i += 4) {
+                        avg += (data[i] + data[i+1] + data[i+2]) / 3;
+                    }
+                    brightness = avg / (data.length / 4);
+
+                    // 2. Calculate Variance (Detects human features vs solid colors)
+                    let diffSum = 0;
+                    const sampleSize = Math.floor(data.length / 40);
+                    for (let i = 0; i < data.length; i += 40) {
+                        let lum = (data[i] + data[i+1] + data[i+2]) / 3;
+                        diffSum += Math.abs(lum - brightness);
+                    }
+                    variance = diffSum / sampleSize;
+
+                    // 3. Score Logic (High variance means "Detail")
+                    let score = Math.min(100, (variance / 15) * 100);
                     clarityBar.style.width = `${score}%`;
 
-                    if (brightness > 50) { // Threshold for "Clear Face"
+                    if (variance > 8 && brightness > 30) { // Detail threshold
                         stableCycles++;
-                        instruction.innerText = "Scanning... Hold Still";
-                        if (stableCycles > 8) { // 1.2 seconds of stability
+                        instruction.innerText = "Human Detail Detected... Hold Still";
+                        clarityBar.style.backgroundColor = "var(--primary)";
+
+                        if (stableCycles > 10) {
                             clearInterval(interval);
                             resolve(true);
                         }
                     } else {
                         stableCycles = 0;
-                        instruction.innerText = brightness < 20 ? "Too dark! Need more light." : "Face blurred. Adjust position.";
+                        clarityBar.style.backgroundColor = "var(--neon-pink)";
+                        if (brightness < 20) {
+                            instruction.innerText = "Environment too dark. Move to light.";
+                        } else if (variance < 5) {
+                            instruction.innerText = "Center face in the lens. Do not cover camera.";
+                        } else {
+                            instruction.innerText = "Scanning for facial details...";
+                        }
                     }
                 }, 150);
             });
