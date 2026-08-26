@@ -29,6 +29,10 @@ I have completed the highly professional upgrade for the GenZ Loan app, implemen
 ### 6. Flexible Mobile Payouts
 - **Dynamic Pre-fill**: The Mobile Money payout field now defaults to the user's signup number but remains fully editable for any international phone number.
 
+### 7. Professional APK Delivery
+- **Version 1.3.0**: Released a new build with all "High-Brain" features integrated.
+- **Single File Policy**: The latest signed APK is now delivered directly to your **Downloads** folder as **"Genz loan.apk"**, overwriting any previous versions.
+
 ## Verification Results
 
 ### Manual Test Scenarios

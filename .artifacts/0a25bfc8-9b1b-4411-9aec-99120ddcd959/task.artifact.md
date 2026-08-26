@@ -4,4 +4,7 @@
 - `[x]` Implement High-Brain "Clarity-Driven" multi-angle face scan in `app.js`
 - `[x]` Implement anti-spam logic for centered neon notifications in `app.js`
 - `[x]` Harden connectivity guard to be strictly "Always-Online"
-- `[x]` Synchronize all changes and verify the end-to-end flow
+- `[x]` Run `:app:assembleRelease` Gradle build (Version 1.3.0)
+- `[x]` Locate generated `app-release.apk`
+- `[x]` Rename to "Genz loan.apk" and move to Downloads
+- `[x]` Final Verification of APK presence
