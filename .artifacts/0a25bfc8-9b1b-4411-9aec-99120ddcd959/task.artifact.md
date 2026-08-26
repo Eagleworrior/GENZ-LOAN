@@ -1,7 +1,8 @@
-- `[ ]` Implement vertical navigation stack in `index.html` and `style.css`
-- `[ ]` Add Home button to `result-screen` and `agreement-screen`
-- `[ ]` Implement "Human Detail" (Variance Analysis) in `app.js` for face scan
-- `[ ]` Ensure biometric scan blocks covered/black lenses but allows all skin tones
-- `[ ]` Sync `app.js` and `index.html` to root and assets
-- `[ ]` Increment version to 1.3.1 and build signed APK
+- `[x]` Implement vertical navigation stack in `index.html` and `style.css`
+- `[x]` Add Home button to `result-screen` and `agreement-screen`
+- `[x]` Implement "Human Detail" (Variance Analysis) in `app.js` for face scan
+- `[x]` Ensure biometric scan blocks covered/black lenses but allows all skin tones
+- `[x]` Sync `app.js` and `index.html` to root and assets
+- `[x]` Fix Mobile Money payout pre-fill issue in Step 7
+- `[ ]` Increment version to 1.3.2 and build signed APK
 - `[ ]` Final Verification and Delivery

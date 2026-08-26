@@ -16,6 +16,7 @@ I have implemented the "Human Detail" biometric hardening and refined the naviga
 
 ### 3. Application Resume & Persistence
 - **State Locking**: Verified that all data is "locked" and saved on every step. Clicking the new Home button and then returning to "Apply Loan" correctly resumes at the last saved step with all information intact.
+- **Auto-Payout Initialization**: Fixed a bug where the "Mobile Money" phone number was empty by default. It now automatically locks to the user's registration number upon reaching the step, preventing "Please provide details" errors.
 
 ### 4. Professional APK Delivery (Version 1.3.1)
 - **Signed Build**: Generated a new signed APK with these "Extra Strict" biometric and UI updates.

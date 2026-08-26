@@ -503,6 +503,9 @@ function updateStepUI() {
     if (submitBtn) {
         if (currentStep === totalSteps) {
             submitBtn.innerHTML = 'Complete Verification <i class="fa-solid fa-circle-check"></i>';
+            // Initialize Step 7 fields if entering this step
+            const method = document.querySelector('input[name="payout-method"]:checked').value;
+            togglePayoutFields(method);
         } else {
             submitBtn.innerHTML = 'Next Step <i class="fa-solid fa-arrow-right"></i>';
         }
