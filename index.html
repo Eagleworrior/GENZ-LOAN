@@ -56,8 +56,53 @@
     <div id="app">
         <div id="toast-container"></div>
 
+        <!-- Terms & Privacy Screen -->
+        <div id="terms-screen" class="screen active">
+            <h1 class="logo">GenZ <span>Loan</span></h1>
+            <div class="card glass terms-card">
+                <div class="terms-header">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--neon-blue)"></i>
+                    <h2>Terms & Privacy</h2>
+                </div>
+                <div class="terms-content">
+                    <h3>1. Introduction</h3>
+                    <p>Welcome to GenZ Loan. By using our application, you agree to comply with and be bound by the following terms and conditions of use.</p>
+
+                    <h3>2. Privacy Policy</h3>
+                    <p>We respect your privacy. We collect biometric data and personal information solely for identity verification and loan qualification purposes. Your data is encrypted with 256-bit security.</p>
+
+                    <h3>3. Loan Agreements</h3>
+                    <p>Interest rates are dynamically calculated between 8% and 15%. Repayment periods range from 21 to 90 days depending on the loan size.</p>
+
+                    <h3>4. Processing Fees</h3>
+                    <p>A non-refundable processing fee (equivalent to 500 KES) is required for each loan disbursement to cover administrative costs.</p>
+
+                    <h3>5. Support</h3>
+                    <p>For any inquiries or assistance, please contact our dedicated support team at <span style="color: var(--neon-cyan)">genzloans@gmail.com</span></p>
+
+                    <h3>6. User Conduct</h3>
+                    <p>Providing fake information or fraudulent documents will result in permanent account suspension and legal action.</p>
+                </div>
+                <div class="terms-footer">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="check-terms">
+                        <span class="checkmark"></span>
+                        I agree to the Terms & Conditions
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="check-privacy">
+                        <span class="checkmark"></span>
+                        I accept the Privacy Policy
+                    </label>
+                    <button id="btn-accept-terms" class="btn primary glow" style="margin-top: 20px;" disabled>
+                        Proceed to Account <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Auth Screen -->
-        <div id="auth-screen" class="screen active">
+        <div id="auth-screen" class="screen">
             <h1 class="logo">GenZ <span>Loan</span></h1>
             <div class="card glass">
                 <h2 id="auth-title">Create Account</h2>
@@ -144,7 +189,10 @@
         <!-- Loan Application Screen -->
         <div id="apply-screen" class="screen">
             <header>
-                <button class="back-btn" onclick="prevStep()"><i class="fa-solid fa-chevron-left"></i></button>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button class="back-btn" onclick="prevStep()"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
+                </div>
                 <h2>Premium Verification</h2>
             </header>
 
@@ -407,6 +455,18 @@
                                 </label>
                             </div>
 
+                            <!-- Mobile Money Fields -->
+                            <div id="mobile-payout-fields" style="margin-top: 20px;">
+                                <label class="decorated-label">Receiving Phone Number</label>
+                                <div class="input-group">
+                                    <i class="fa-solid fa-mobile-retro" style="color: var(--neon-cyan)"></i>
+                                    <input type="tel" id="payout-phone" placeholder="Enter Mobile Number" required>
+                                </div>
+                                <p class="input-hint" style="font-size: 0.6rem; color: var(--text-dim); margin-top: 5px;">
+                                    * Defaulted to your registration number. You can change this if needed.
+                                </p>
+                            </div>
+
                             <div id="bank-details-fields" style="display: none; margin-top: 20px;">
                                 <label class="decorated-label">Bank Name</label>
                                 <div class="input-group">
@@ -444,13 +504,53 @@
 
         <!-- Scan Screen -->
         <div id="scan-screen" class="screen">
-            <div class="card center-text full-height">
-                <h2>Liveness Check</h2>
-                <div class="camera-container-v2">
-                    <video id="camera-feed" autoplay playsinline muted></video>
-                    <div class="scanner-ring"></div>
+            <div class="card center-text full-height scan-card">
+                <div class="scan-status-header">
+                    <div class="scan-step-dot active" id="dot-front"></div>
+                    <div class="scan-step-dot" id="dot-left"></div>
+                    <div class="scan-step-dot" id="dot-right"></div>
                 </div>
-                <p id="scan-instruction" class="instruction-v2">Position face in frame</p>
+                <h2>Biometric Verification</h2>
+                <div class="camera-container-v3">
+                    <video id="camera-feed" autoplay playsinline muted></video>
+                    <div class="scanner-lens">
+                        <div class="corner top-left"></div>
+                        <div class="corner top-right"></div>
+                        <div class="corner bottom-left"></div>
+                        <div class="corner bottom-right"></div>
+                        <div class="scan-line"></div>
+                    </div>
+                </div>
+                <p id="scan-instruction" class="instruction-v2">Position face in center lens</p>
+                <div id="clarity-meter" class="clarity-meter">
+                    <div class="clarity-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Screen -->
+        <div id="processing-screen" class="screen">
+            <div class="card center-text full-height processing-card">
+                <div class="process-loader">
+                    <svg class="progress-ring" width="120" height="120">
+                        <circle class="progress-ring-circle-bg" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                        <circle id="process-ring-fill" class="progress-ring-circle" stroke="var(--primary)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                    </svg>
+                    <div class="check-icon-success"><i class="fa-solid fa-check"></i></div>
+                </div>
+                <h2 id="process-title" style="color: var(--primary)">Processing Funds</h2>
+                <div class="process-details">
+                    <p id="process-msg">Validating your transaction with the bank...</p>
+                    <div class="time-badge">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Est. Release: 1 - 6 Hours
+                    </div>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 30px;">
+                    You will receive a confirmation once the funds land in your account.
+                </p>
+                <button onclick="showScreen('dashboard-screen')" class="btn primary glow" id="btn-process-done" style="display:none; margin-top: 20px;">
+                    Back to Menu
+                </button>
             </div>
         </div>
 

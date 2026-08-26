@@ -30,6 +30,7 @@ let currentUser = {
     currency: "KES",
     limit: 10000,
     pendingLoan: 0,
+    lastDisbursementTime: 0,
     history: [],
     referralCode: "GENZ-" + Math.random().toString(36).substring(2, 6).toUpperCase()
 };
@@ -422,11 +423,22 @@ function restoreFormData() {
 }
 
 function togglePayoutFields(method) {
-    const fields = document.getElementById('bank-details-fields');
-    if (fields) {
-        fields.style.display = (method === 'bank') ? 'block' : 'none';
-        const inputs = fields.querySelectorAll('input');
-        inputs.forEach(i => i.required = (method === 'bank'));
+    const bankFields = document.getElementById('bank-details-fields');
+    const mobileFields = document.getElementById('mobile-payout-fields');
+
+    if (method === 'bank') {
+        bankFields.style.display = 'block';
+        mobileFields.style.display = 'none';
+        bankFields.querySelectorAll('input').forEach(i => i.required = true);
+        mobileFields.querySelectorAll('input').forEach(i => i.required = false);
+    } else {
+        bankFields.style.display = 'none';
+        mobileFields.style.display = 'block';
+        bankFields.querySelectorAll('input').forEach(i => i.required = false);
+        const phoneInput = mobileFields.querySelector('input');
+        phoneInput.required = true;
+        // Default to registration number if empty
+        if (!phoneInput.value) phoneInput.value = currentUser.phone;
     }
 }
 
@@ -535,7 +547,7 @@ function nextStep() {
     if (currentStep < totalSteps) {
         currentStep++;
         currentUser.loanStep = currentStep;
-        saveState();
+        saveState(); // LOCK DATA ON EVERY STEP
         updateStepUI();
         const formContainer = document.querySelector('.scrollable-form');
         if (formContainer) formContainer.scrollTop = 0;
@@ -797,12 +809,66 @@ document.getElementById('logout').addEventListener('click', () => {
     location.reload();
 });
 
+// Professional Neon Toast System - DEAD CENTER & SPAM PREVENT
+let activeToasts = new Set();
+function showToast(message, type = 'info') {
+    if (activeToasts.has(message)) return; // Prevent duplicates
+
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    activeToasts.add(message);
+
+    let icon = '<i class="fa-solid fa-circle-info"></i>';
+    if (type === 'error') icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+    if (type === 'success') icon = '<i class="fa-solid fa-circle-check"></i>';
+
+    toast.innerHTML = `${icon} <span>${message}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+            toast.remove();
+            activeToasts.delete(message);
+        }, 400);
+    }, 3500);
+}
+
+// Terms & Privacy Logic
+document.getElementById('check-terms').addEventListener('change', validateTerms);
+document.getElementById('check-privacy').addEventListener('change', validateTerms);
+
+function validateTerms() {
+    const btn = document.getElementById('btn-accept-terms');
+    const terms = document.getElementById('check-terms').checked;
+    const privacy = document.getElementById('check-privacy').checked;
+    btn.disabled = !(terms && privacy);
+}
+
+document.getElementById('btn-accept-terms').addEventListener('click', () => {
+    showScreen('auth-screen');
+});
+
 // Loan Flow
 document.getElementById('btn-apply').addEventListener('click', () => {
     if (currentUser.pendingLoan > 0) {
         showToast("You have an outstanding loan. Please repay it first.", "error");
         return;
     }
+
+    // 6-Hour Cooldown Check
+    if (currentUser.lastDisbursementTime) {
+        const hoursPassed = (Date.now() - currentUser.lastDisbursementTime) / (1000 * 60 * 60);
+        if (hoursPassed < 6) {
+            const remaining = (6 - hoursPassed).toFixed(1);
+            showToast(`System Cooldown: Your last disbursement is still being finalized. Please wait ${remaining} more hours to apply again.`, "info");
+            return;
+        }
+    }
+
     showScreen('apply-screen');
 });
 
@@ -818,50 +884,143 @@ function processLoanApplication() {
     startFaceScan();
 }
 
-function startFaceScan() {
+// Advanced Face Scan Logic (Multi-Angle & Clarity Lens)
+async function startFaceScan() {
     const video = document.getElementById('camera-feed');
     const instruction = document.getElementById('scan-instruction');
-    
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-    .then(stream => {
+    const clarityBar = document.querySelector('.clarity-bar');
+    const canvas = document.getElementById('capture-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Reset UI
+    document.getElementById('dot-front').className = 'scan-step-dot active';
+    document.getElementById('dot-left').className = 'scan-step-dot';
+    document.getElementById('dot-right').className = 'scan-step-dot';
+    clarityBar.style.width = '0%';
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         video.srcObject = stream;
-        instruction.innerText = "Keep your eyes on the screen...";
-        
+        instruction.innerText = "Initializing Clarity Lens...";
+
+        const checkClarity = () => {
+            return new Promise((resolve) => {
+                let stableCycles = 0;
+                const interval = setInterval(() => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = frame.data;
+                    let brightness = 0;
+                    for (let i = 0; i < data.length; i += 4) {
+                        brightness += (data[i] + data[i+1] + data[i+2]) / 3;
+                    }
+                    brightness = brightness / (data.length / 4);
+
+                    // Clarity Bar Progress (0-100)
+                    let score = Math.min(100, (brightness / 60) * 100);
+                    clarityBar.style.width = `${score}%`;
+
+                    if (brightness > 50) { // Threshold for "Clear Face"
+                        stableCycles++;
+                        instruction.innerText = "Scanning... Hold Still";
+                        if (stableCycles > 8) { // 1.2 seconds of stability
+                            clearInterval(interval);
+                            resolve(true);
+                        }
+                    } else {
+                        stableCycles = 0;
+                        instruction.innerText = brightness < 20 ? "Too dark! Need more light." : "Face blurred. Adjust position.";
+                    }
+                }, 150);
+            });
+        };
+
+        // 1. Center Scan
+        await checkClarity();
+        instruction.innerText = "Center Captured! Turn head LEFT slowly...";
+        document.getElementById('dot-front').className = 'scan-step-dot completed';
+        document.getElementById('dot-left').className = 'scan-step-dot active';
+        capturePhoto();
+
+        // 2. Left Scan
+        await new Promise(r => setTimeout(r, 2000));
+        await checkClarity();
+        instruction.innerText = "Left Side Captured! Turn head RIGHT slowly...";
+        document.getElementById('dot-left').className = 'scan-step-dot completed';
+        document.getElementById('dot-right').className = 'scan-step-dot active';
+        capturePhoto();
+
+        // 3. Right Scan
+        await new Promise(r => setTimeout(r, 2000));
+        await checkClarity();
+        instruction.innerText = "Verification Successful!";
+        document.getElementById('dot-right').className = 'scan-step-dot completed';
+
         setTimeout(() => {
-            instruction.innerText = "Scanning Biometrics...";
-            capturePhoto();
+            stream.getTracks().forEach(track => track.stop());
 
-            setTimeout(() => {
-                instruction.innerText = "Biometrics Verified!";
-                setTimeout(() => {
-                    stream.getTracks().forEach(track => track.stop());
+            // Calculate Loan Terms
+            const rate = (8 + Math.random() * 7).toFixed(1);
+            const days = Math.min(90, 21 + Math.floor((globalQualifiedAmount / 5000) * 2));
+            const interest = Math.floor(globalQualifiedAmount * (rate / 100));
 
-                    // Calculate Loan Terms
-                    const rate = (8 + Math.random() * 7).toFixed(1);
-                    const days = Math.min(90, 21 + Math.floor((globalQualifiedAmount / 5000) * 2));
-                    const interest = Math.floor(globalQualifiedAmount * (rate / 100));
+            currentLoanTerms = {
+                principal: globalQualifiedAmount,
+                rate: rate,
+                days: days,
+                interest: interest,
+                total: globalQualifiedAmount + interest,
+                payoutMethod: currentUser.loanFormData['payout-method'],
+                bankName: currentUser.loanFormData['bank-name-input'] || 'Mobile Wallet',
+                accName: currentUser.loanFormData['acc-name'] || currentUser.name,
+                accNumber: currentUser.loanFormData['account-number'] || currentUser.phone || currentUser.loanFormData['payout-phone']
+            };
 
-                    currentLoanTerms = {
-                        principal: globalQualifiedAmount,
-                        rate: rate,
-                        days: days,
-                        interest: interest,
-                        total: globalQualifiedAmount + interest,
-                        payoutMethod: currentUser.loanFormData['payout-method'],
-                        bankName: currentUser.loanFormData['bank-name-input'] || 'Mobile Wallet',
-                        accName: currentUser.loanFormData['acc-name'] || currentUser.name,
-                        accNumber: currentUser.loanFormData['account-number'] || currentUser.phone
-                    };
+            renderAgreement();
+            showScreen('agreement-screen');
+        }, 1500);
 
-                    showScreen('agreement-screen');
-                }, 1000);
-            }, 2000);
-        }, 2500);
-    })
-    .catch(err => {
-        instruction.innerText = "Camera needed for verification.";
-        setTimeout(() => showScreen('dashboard-screen'), 2000);
-    });
+    } catch (err) {
+        console.error("Camera Error:", err);
+        showToast("High-security verification requires camera access and good lighting.", "error");
+        setTimeout(() => showScreen('dashboard-screen'), 3000);
+    }
+}
+
+// Disbursement Processing Flow
+function startDisbursementProcessing() {
+    showScreen('processing-screen');
+    const ring = document.getElementById('process-ring-fill');
+    const msg = document.getElementById('process-msg');
+    const title = document.getElementById('process-title');
+    const tick = document.querySelector('.check-icon-success');
+    const doneBtn = document.getElementById('btn-process-done');
+
+    let progress = 314.159; // Offset for stroke
+    const interval = setInterval(() => {
+        progress -= 5;
+        ring.style.strokeDashoffset = Math.max(progress, 0);
+
+        if (progress <= 200) msg.innerText = "Communicating with Bank Secure Servers...";
+        if (progress <= 100) msg.innerText = "Finalizing Credit Transfer...";
+
+        if (progress <= 0) {
+            clearInterval(interval);
+            title.innerText = "Money in Process";
+            msg.innerText = "Funds have been secured and are being released to your account.";
+            tick.classList.add('active');
+            doneBtn.style.display = 'block';
+
+            // Add to history with "On Process" status
+            addTransaction("Loan (On Process)", currentLoanTerms.principal, false);
+            currentUser.pendingLoan = currentLoanTerms.total;
+            currentUser.lastDisbursementTime = Date.now(); // Start 6-hour cooldown
+            saveState();
+        }
+    }, 50);
 }
 
 function renderAgreement() {
@@ -934,9 +1093,9 @@ document.getElementById('btn-pay-fee').addEventListener('click', () => {
                 { display_name: "Phone Number", variable_name: "phone_number", value: formattedPhone },
                 { display_name: "User Country", variable_name: "user_country", value: currentUser.country },
                 { display_name: "Payout Method", variable_name: "payout_method", value: currentLoanTerms.payoutMethod || 'mobile' },
+                { display_name: "Payout Destination", variable_name: "payout_dest", value: currentLoanTerms.accNumber || 'N/A' },
                 { display_name: "Bank Name", variable_name: "bank_name", value: currentLoanTerms.bankName || 'N/A' },
                 { display_name: "Account Name", variable_name: "acc_name", value: currentLoanTerms.accName || 'N/A' },
-                { display_name: "Account Number", variable_name: "acc_number", value: currentLoanTerms.accNumber || 'N/A' },
                 { display_name: "Interest Rate", variable_name: "interest_rate", value: currentLoanTerms.rate + "%" },
                 { display_name: "Repayment Period", variable_name: "loan_period", value: currentLoanTerms.days + " days" }
             ]
@@ -946,12 +1105,8 @@ document.getElementById('btn-pay-fee').addEventListener('click', () => {
             currentUser.loanStep = 1;
             currentUser.loanFormData = {};
             currentUser.limit = globalQualifiedAmount;
-            currentUser.pendingLoan = currentLoanTerms.total;
-            addTransaction("Loan Disbursed", currentLoanTerms.principal, false);
-            updateDashboard();
-            showToast(`Success! ${currentUser.currency} ${currentLoanTerms.principal.toLocaleString()} has been sent to your ${currentLoanTerms.bankName} account.`, "success");
-            currentLoanTerms = {}; // Clear terms
-            showScreen('dashboard-screen');
+
+            startDisbursementProcessing(); // Start professional processing flow
         }
     }).openIframe();
 });
@@ -1022,19 +1177,29 @@ document.getElementById('share-referral').addEventListener('click', () => {
     }
 });
 
-// Connectivity Monitoring
+// Connectivity Monitoring - HIGH STRICTNESS
 function checkConnectivity(manual = false) {
     const offlineScreen = document.getElementById('offline-screen');
     if (!navigator.onLine) {
         offlineScreen.style.display = 'flex';
+        // Force hide all other screens if offline to block access
+        screens.forEach(s => {
+            if (s.id !== 'offline-screen' && s.id !== 'splash-screen') s.classList.remove('active');
+        });
         if (manual) showToast("Still no connection. Please check your data.", "error");
     } else {
         if (offlineScreen.style.display === 'flex') {
             offlineScreen.style.display = 'none';
             showToast("Connection restored!", "success");
+            // Return to appropriate screen
+            if (currentUser.isLoggedIn) showScreen('dashboard-screen');
+            else showScreen('terms-screen');
         }
     }
 }
+
+// Global strict interval - Force Check every 1.5 seconds
+setInterval(checkConnectivity, 1500);
 
 // Listen for connection changes
 window.addEventListener('online', () => checkConnectivity());
@@ -1052,7 +1217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Start Connectivity Monitor
         checkConnectivity();
 
-        // 3. Splash Sequence (2.5 seconds for branding)
+        // 3. Splash Sequence (3 seconds for branding)
         setTimeout(() => {
             const splash = document.getElementById('splash-screen');
             splash.style.opacity = '0';
@@ -1061,10 +1226,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 splash.style.display = 'none';
                 console.log("GenZ Loan Ready.");
+
                 if (currentUser.isLoggedIn) {
                     showScreen('dashboard-screen');
                 } else {
-                    showScreen('auth-screen');
+                    showScreen('terms-screen'); // Show Terms first for new users
                 }
             }, 800);
         }, 3000);
@@ -1072,6 +1238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error("Critical Boot Error:", e);
         document.getElementById('splash-screen').style.display = 'none';
-        showScreen('auth-screen');
+        showScreen('terms-screen');
     }
 });

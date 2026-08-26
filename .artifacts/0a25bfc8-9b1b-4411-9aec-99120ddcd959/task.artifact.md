@@ -1,7 +1,7 @@
-- `[x]` Create high-end Splash Screen UI in `index.html`
-- `[x]` Create strict Offline Screen UI in `index.html`
-- `[x]` Style Splash and Offline screens with neon animations in `style.css`
-- `[x]` Implement connectivity monitoring logic in `app.js`
-- `[x]` Implement startup sequence (Splash -> Connectivity Check) in `app.js`
-- `[x]` Replace `alert()` calls with `showToast()` in connectivity logic
-- `[x]` Synchronize all changes and verify offline transitions
+- `[x]` Update `index.html` with Home button, advanced scan UI, and mobile payout field
+- `[x]` Style centered toasts, biometric lenses, and home button in `style.css`
+- `[x]` Implement real-time application "Pause & Resume" logic in `app.js`
+- `[x]` Implement High-Brain "Clarity-Driven" multi-angle face scan in `app.js`
+- `[x]` Implement anti-spam logic for centered neon notifications in `app.js`
+- `[x]` Harden connectivity guard to be strictly "Always-Online"
+- `[x]` Synchronize all changes and verify the end-to-end flow
