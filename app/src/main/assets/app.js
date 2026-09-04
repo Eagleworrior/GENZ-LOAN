@@ -875,145 +875,148 @@ document.getElementById('btn-apply').addEventListener('click', () => {
     showScreen('apply-screen');
 });
 
-function processLoanApplication() {
+const DOCUMENT_TYPES = {
+    "Government ID": [
+        { name: "Passport", icon: "fa-passport", guidance: "Capture the biodata page. Ensure MRZ (bottom text) is clear." },
+        { name: "National ID", icon: "fa-id-card", guidance: "Capture the front side first. Ensure all corners are visible." },
+        { name: "Driver's Licence", icon: "fa-id-badge", guidance: "Capture the photo side. Ensure text is readable." },
+        { name: "Residence Permit", icon: "fa-id-card-clip", guidance: "Capture the front side showing your photo and expiry." },
+        { name: "Voter Registration Card", icon: "fa-check-to-slot", guidance: "Ensure the registration number and photo are sharp." },
+        { name: "Social Security Card", icon: "fa-shield-halved", guidance: "Capture the front of your SSN/NHIF card." }
+    ],
+    "Proof of Address": [
+        { name: "Utility Bill", icon: "fa-file-invoice-dollar", guidance: "Must be from last 3 months. Ensure name and address match your profile." },
+        { name: "Bank Statement", icon: "fa-file-lines", guidance: "Recent statement (last 30 days) showing residential address." },
+        { name: "Tenancy Agreement", icon: "fa-house-chimney-user", guidance: "Official signed lease document. Capture the address and signatures page." },
+        { name: "Payslip", icon: "fa-money-check-dollar", guidance: "Recent employer payslip showing your home address." }
+    ],
+    "Financial & Business": [
+        { name: "Credit Card Statement", icon: "fa-credit-card", guidance: "Recent statement showing your billing address." },
+        { name: "Tax Assessment", icon: "fa-file-signature", guidance: "Official government tax document showing your Tax ID." },
+        { name: "Certificate of Incorporation", icon: "fa-building-shield", guidance: "For business accounts. Capture the registration certificate." },
+        { name: "Business Bank Statement", icon: "fa-landmark-flag", guidance: "Last 3 months of business transaction history." }
+    ],
+    "Other Identity Proofs": [
+        { name: "Student ID", icon: "fa-user-graduate", guidance: "Current university or college ID showing expiry date." },
+        { name: "National Service Card", icon: "fa-person-military-pointing", guidance: "Official government service or military identification." },
+        { name: "Health Insurance Card", icon: "fa-heart-pulse", guidance: "Card must include your photo and official issuer logo." }
+    ]
+};
+
+let selectedDoc = null;
+
+function renderDocSelector(filter = "") {
+    const container = document.getElementById('doc-categories');
+    if (!container) return;
+
+    let html = "";
+    Object.keys(DOCUMENT_TYPES).forEach(cat => {
+        const filteredDocs = DOCUMENT_TYPES[cat].filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
+        if (filteredDocs.length > 0) {
+            html += `<div class="doc-category"><h4>${cat}</h4>`;
+            filteredDocs.forEach(doc => {
+                html += `
+                    <div class="doc-item ${selectedDoc?.name === doc.name ? 'selected' : ''}" onclick="selectDoc('${doc.name}', '${cat}')">
+                        <i class="fa-solid ${doc.icon}"></i>
+                        <span>${doc.name}</span>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+    });
+
+    if (!html) html = '<p class="center-text" style="color: var(--text-dim);">No documents found.</p>';
+    container.innerHTML = html;
+}
+
+function selectDoc(name, cat) {
+    selectedDoc = DOCUMENT_TYPES[cat].find(d => d.name === name);
+    document.getElementById('btn-continue-kyc').disabled = false;
+    renderDocSelector(document.getElementById('doc-search').value);
+}
+
+document.getElementById('doc-search')?.addEventListener('input', (e) => renderDocSelector(e.target.value));
+
+document.getElementById('btn-continue-kyc')?.addEventListener('click', () => {
+    if (!selectedDoc) return;
+    document.getElementById('doc-name-display').innerText = selectedDoc.name;
+    document.getElementById('doc-guidance-text').innerText = selectedDoc.guidance;
+    document.querySelector('.guidance-icon-box i').className = `fa-solid ${selectedDoc.icon}`;
+    showScreen('kyc-guidance-screen');
+});
+
+// Bridge Functions
+function launchNativeKYC() {
+    if (typeof AndroidKYC !== 'undefined') {
+        AndroidKYC.startVerification("DOCUMENT");
+    } else {
+        showToast("Secure Camera requires the official Android App.", "error");
+    }
+}
+
+function launchNativeLiveness() {
+    if (typeof AndroidKYC !== 'undefined') {
+        AndroidKYC.startVerification("SELFIE");
+    } else {
+        showToast("Video Liveness requires the official Android App.", "error");
+    }
+}
+
+// Callback from Native
+window.onKYCResult = function(result) {
+    console.log("KYC Result:", result);
+    if (result.status === "DOCUMENT_SUCCESS") {
+        currentUser.kycFront = result.frontPath;
+        currentUser.kycBack = result.backPath;
+        showToast("Document captured successfully!", "success");
+        showScreen('kyc-liveness-screen');
+    } else if (result.status === "SELFIE_SUCCESS") {
+        showToast("Identity verified! Highest security cleared.", "success");
+        finalizeLoanApplication();
+    } else {
+        showToast("Verification cancelled or failed. Please retry.", "error");
+    }
+};
+
+function finalizeLoanApplication() {
     const income = parseInt(document.getElementById('income').value) || 0;
     const expenses = parseInt(document.getElementById('expenses').value) || 0;
     const existingLoans = parseInt(document.getElementById('existing-loans').value) || 0;
 
     let disposable = income - expenses - existingLoans;
     globalQualifiedAmount = Math.max(5000, Math.min(250000, Math.floor((disposable * 2.5) / 1000) * 1000));
-    
-    showScreen('scan-screen');
-    startFaceScan();
+
+    // Calculate Loan Terms
+    const rate = (8 + Math.random() * 7).toFixed(1);
+    const days = Math.min(90, 21 + Math.floor((globalQualifiedAmount / 5000) * 2));
+    const interest = Math.floor(globalQualifiedAmount * (rate / 100));
+
+    currentLoanTerms = {
+        principal: globalQualifiedAmount,
+        rate: rate,
+        days: days,
+        interest: interest,
+        total: globalQualifiedAmount + interest,
+        payoutMethod: currentUser.loanFormData['payout-method'],
+        bankName: currentUser.loanFormData['bank-name-input'] || 'Mobile Wallet',
+        accName: currentUser.loanFormData['acc-name'] || currentUser.name,
+        accNumber: currentUser.loanFormData['account-number'] || currentUser.phone || currentUser.loanFormData['payout-phone']
+    };
+
+    renderAgreement();
+    showScreen('agreement-screen');
 }
 
-// Advanced Face Scan Logic (Multi-Angle & Clarity Lens)
+// Override old processLoanApplication
+function processLoanApplication() {
+    renderDocSelector();
+    showScreen('kyc-selector-screen');
+}
+
+// Advanced Face Scan Logic (REMOVED - Replaced by Native)
 async function startFaceScan() {
-    const video = document.getElementById('camera-feed');
-    const instruction = document.getElementById('scan-instruction');
-    const clarityBar = document.querySelector('.clarity-bar');
-    const canvas = document.getElementById('capture-canvas');
-    const ctx = canvas.getContext('2d');
-
-    // Reset UI
-    document.getElementById('dot-front').className = 'scan-step-dot active';
-    document.getElementById('dot-left').className = 'scan-step-dot';
-    document.getElementById('dot-right').className = 'scan-step-dot';
-    clarityBar.style.width = '0%';
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-        video.srcObject = stream;
-        instruction.innerText = "Initializing Clarity Lens...";
-
-        const checkClarity = () => {
-            return new Promise((resolve) => {
-                let stableCycles = 0;
-                const interval = setInterval(() => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const data = frame.data;
-
-                    let brightness = 0;
-                    let variance = 0;
-                    let avg = 0;
-
-                    // 1. Calculate Average Brightness
-                    for (let i = 0; i < data.length; i += 4) {
-                        avg += (data[i] + data[i+1] + data[i+2]) / 3;
-                    }
-                    brightness = avg / (data.length / 4);
-
-                    // 2. Calculate Variance (Detects human features vs solid colors)
-                    let diffSum = 0;
-                    const sampleSize = Math.floor(data.length / 40);
-                    for (let i = 0; i < data.length; i += 40) {
-                        let lum = (data[i] + data[i+1] + data[i+2]) / 3;
-                        diffSum += Math.abs(lum - brightness);
-                    }
-                    variance = diffSum / sampleSize;
-
-                    // 3. Score Logic (High variance means "Detail")
-                    let score = Math.min(100, (variance / 15) * 100);
-                    clarityBar.style.width = `${score}%`;
-
-                    if (variance > 8 && brightness > 30) { // Detail threshold
-                        stableCycles++;
-                        instruction.innerText = "Human Detail Detected... Hold Still";
-                        clarityBar.style.backgroundColor = "var(--primary)";
-
-                        if (stableCycles > 10) {
-                            clearInterval(interval);
-                            resolve(true);
-                        }
-                    } else {
-                        stableCycles = 0;
-                        clarityBar.style.backgroundColor = "var(--neon-pink)";
-                        if (brightness < 20) {
-                            instruction.innerText = "Environment too dark. Move to light.";
-                        } else if (variance < 5) {
-                            instruction.innerText = "Center face in the lens. Do not cover camera.";
-                        } else {
-                            instruction.innerText = "Scanning for facial details...";
-                        }
-                    }
-                }, 150);
-            });
-        };
-
-        // 1. Center Scan
-        await checkClarity();
-        instruction.innerText = "Center Captured! Turn head LEFT slowly...";
-        document.getElementById('dot-front').className = 'scan-step-dot completed';
-        document.getElementById('dot-left').className = 'scan-step-dot active';
-        capturePhoto();
-
-        // 2. Left Scan
-        await new Promise(r => setTimeout(r, 2000));
-        await checkClarity();
-        instruction.innerText = "Left Side Captured! Turn head RIGHT slowly...";
-        document.getElementById('dot-left').className = 'scan-step-dot completed';
-        document.getElementById('dot-right').className = 'scan-step-dot active';
-        capturePhoto();
-
-        // 3. Right Scan
-        await new Promise(r => setTimeout(r, 2000));
-        await checkClarity();
-        instruction.innerText = "Verification Successful!";
-        document.getElementById('dot-right').className = 'scan-step-dot completed';
-
-        setTimeout(() => {
-            stream.getTracks().forEach(track => track.stop());
-
-            // Calculate Loan Terms
-            const rate = (8 + Math.random() * 7).toFixed(1);
-            const days = Math.min(90, 21 + Math.floor((globalQualifiedAmount / 5000) * 2));
-            const interest = Math.floor(globalQualifiedAmount * (rate / 100));
-
-            currentLoanTerms = {
-                principal: globalQualifiedAmount,
-                rate: rate,
-                days: days,
-                interest: interest,
-                total: globalQualifiedAmount + interest,
-                payoutMethod: currentUser.loanFormData['payout-method'],
-                bankName: currentUser.loanFormData['bank-name-input'] || 'Mobile Wallet',
-                accName: currentUser.loanFormData['acc-name'] || currentUser.name,
-                accNumber: currentUser.loanFormData['account-number'] || currentUser.phone || currentUser.loanFormData['payout-phone']
-            };
-
-            renderAgreement();
-            showScreen('agreement-screen');
-        }, 1500);
-
-    } catch (err) {
-        console.error("Camera Error:", err);
-        showToast("High-security verification requires camera access and good lighting.", "error");
-        setTimeout(() => showScreen('dashboard-screen'), 3000);
-    }
+    processLoanApplication();
 }
 
 // Disbursement Processing Flow

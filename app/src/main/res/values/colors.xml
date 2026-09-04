@@ -4,4 +4,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#24243e</color>
     <color name="accent">#00ff88</color>
+    <color name="neon_pink">#ff00ff</color>
+    <color name="neon_blue">#00d2ff</color>
+    <color name="neon_yellow">#f3ff00</color>
+    <color name="neon_orange">#ff9d00</color>
+    <color name="bg_dark">#0f0c29</color>
 </resources>

@@ -8,14 +8,45 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.JavascriptInterface
+import android.content.Intent
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private val CAMERA_PERMISSION_CODE = 100
+
+    private val kycLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val status = data?.getStringExtra("STATUS") ?: "CANCELLED"
+            val frontPath = data?.getStringExtra("FRONT_PATH") ?: ""
+            val backPath = data?.getStringExtra("BACK_PATH") ?: ""
+            
+            val response = JSONObject().apply {
+                put("status", status)
+                put("frontPath", frontPath)
+                put("backPath", backPath)
+            }
+            
+            webView.evaluateJavascript("window.onKYCResult($response)", null)
+        }
+    }
+
+    inner class KYCBridge {
+        @JavascriptInterface
+        fun startVerification(mode: String) {
+            val intent = Intent(this@MainActivity, KYCActivity::class.java)
+            intent.putExtra("MODE", mode)
+            kycLauncher.launch(intent)
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +66,8 @@ class MainActivity : AppCompatActivity() {
         webView.settings.mediaPlaybackRequiresUserGesture = false
         webView.settings.javaScriptCanOpenWindowsAutomatically = true
         webView.settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+        webView.addJavascriptInterface(KYCBridge(), "AndroidKYC")
 
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {

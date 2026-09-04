@@ -802,6 +802,118 @@ select option { background: var(--bg-light); color: white; }
     box-shadow: 0 0 10px var(--primary);
 }
 
+/* KYC Global Selector Styles */
+.doc-list-container {
+    max-height: 45vh;
+    overflow-y: auto;
+    margin-top: 15px;
+    padding-right: 5px;
+}
+
+.doc-category {
+    margin-bottom: 20px;
+}
+
+.doc-category h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--neon-blue);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+.doc-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.doc-item i {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+}
+
+.doc-item span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.doc-item:hover, .doc-item.selected {
+    background: rgba(0, 210, 255, 0.1);
+    border-color: var(--neon-blue);
+    transform: translateX(5px);
+}
+
+.doc-item.selected i {
+    color: var(--neon-blue);
+}
+
+/* Guidance UI */
+.guidance-icon-box {
+    width: 100px;
+    height: 100px;
+    background: rgba(0, 210, 255, 0.1);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+}
+
+.guidance-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 25px 0;
+    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.guidance-checklist li {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.guidance-checklist li i {
+    color: var(--accent-emerald);
+}
+
+/* Liveness UI */
+.liveness-pre-box {
+    width: 120px;
+    height: 120px;
+    background: rgba(243, 255, 0, 0.1);
+    border-radius: 30px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: var(--neon-yellow);
+    box-shadow: 0 0 30px rgba(243, 255, 0, 0.2);
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
 /* Processing Screen Styles */
 .processing-card {
     justify-content: center;

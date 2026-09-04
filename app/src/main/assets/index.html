@@ -502,29 +502,82 @@
             </div>
         </div>
 
-        <!-- Scan Screen -->
-        <div id="scan-screen" class="screen">
-            <div class="card center-text full-height scan-card">
-                <div class="scan-status-header">
-                    <div class="scan-step-dot active" id="dot-front"></div>
-                    <div class="scan-step-dot" id="dot-left"></div>
-                    <div class="scan-step-dot" id="dot-right"></div>
+        <!-- KYC Selection Screen -->
+        <div id="kyc-selector-screen" class="screen">
+            <header>
+                <div class="nav-stack">
+                    <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
                 </div>
-                <h2>Biometric Verification</h2>
-                <div class="camera-container-v3">
-                    <video id="camera-feed" autoplay playsinline muted></video>
-                    <div class="scanner-lens">
-                        <div class="corner top-left"></div>
-                        <div class="corner top-right"></div>
-                        <div class="corner bottom-left"></div>
-                        <div class="corner bottom-right"></div>
-                        <div class="scan-line"></div>
-                    </div>
+                <h2>Identity Verification</h2>
+            </header>
+            <div class="card glass">
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 20px;">
+                    Choose the document you'll use. This helps us verify your identity quickly and securely.
+                </p>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="doc-search" placeholder="Search document type...">
                 </div>
-                <p id="scan-instruction" class="instruction-v2">Position face in center lens</p>
-                <div id="clarity-meter" class="clarity-meter">
-                    <div class="clarity-bar"></div>
+
+                <div id="doc-categories" class="doc-list-container">
+                    <!-- Categories injected by JS -->
                 </div>
+
+                <button id="btn-continue-kyc" class="btn primary glow" style="margin-top: 20px;" disabled>
+                    Continue <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- KYC Guidance Screen -->
+        <div id="kyc-guidance-screen" class="screen">
+            <header>
+                <button class="back-btn" onclick="showScreen('kyc-selector-screen')"><i class="fa-solid fa-chevron-left"></i></button>
+                <h2 id="guidance-title">Capture Guide</h2>
+            </header>
+            <div class="card center-text">
+                <div id="guidance-icon" class="guidance-icon-box">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <h3 id="doc-name-display" style="color: var(--neon-blue)">National ID</h3>
+                <p id="doc-guidance-text" style="font-size: 0.9rem; color: var(--text-dim); line-height: 1.6;">
+                    Place your ID on a flat surface. Remove glare and hold steady. Capture the front side first.
+                </p>
+
+                <ul class="guidance-checklist">
+                    <li><i class="fa-solid fa-sun"></i> Good lighting</li>
+                    <li><i class="fa-solid fa-eye"></i> All corners visible</li>
+                    <li><i class="fa-solid fa-wand-magic-sparkles"></i> No glare or shadows</li>
+                    <li><i class="fa-solid fa-user-slash"></i> Remove sunglasses</li>
+                </ul>
+
+                <button onclick="launchNativeKYC()" class="btn primary glow">
+                    Start Secure Capture <i class="fa-solid fa-camera"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- KYC Liveness Screen (Transitional) -->
+        <div id="kyc-liveness-screen" class="screen">
+            <header>
+                <h2 style="color: var(--neon-yellow)">Video Liveness</h2>
+            </header>
+            <div class="card center-text">
+                <div class="liveness-pre-box">
+                    <i class="fa-solid fa-face-smile-beam"></i>
+                </div>
+                <h3>Liveness Check</h3>
+                <p style="color: var(--text-dim); font-size: 0.9rem;">
+                    Center your face in the circle. Follow the prompts: blink or smile when asked.
+                </p>
+                <div class="info-alert" style="border-left-color: var(--neon-yellow)">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--neon-yellow)"></i>
+                    <p>This prevents photos/masks and ensures highest security.</p>
+                </div>
+                <button onclick="launchNativeLiveness()" class="btn primary glow" style="background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange))">
+                    Start Video Selfie <i class="fa-solid fa-video"></i>
+                </button>
             </div>
         </div>
 
