@@ -8,11 +8,18 @@ import android.webkit.*
 import android.content.Intent
 import android.app.Activity
 import android.net.Uri
+import android.util.Base64
+import android.graphics.BitmapFactory
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.json.JSONObject
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 class MainActivity : AppCompatActivity() {
 
@@ -62,6 +69,46 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("DOB", dob)
             kycLauncher.launch(intent)
         }
+
+        @JavascriptInterface
+        fun validateUploadedDoc(base64Str: String, docName: String) {
+            try {
+                val pureBase64 = base64Str.substringAfter(",")
+                val decodedString: ByteArray = Base64.decode(pureBase64, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                
+                if (bitmap == null) {
+                    sendUploadResult("INVALID_FORMAT")
+                    return
+                }
+
+                val image = InputImage.fromBitmap(bitmap, 0)
+                val faceOptions = FaceDetectorOptions.Builder().build()
+                val faceDetector = FaceDetection.getClient(faceOptions)
+                val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+                faceDetector.process(image).addOnSuccessListener { faces ->
+                    textRecognizer.process(image).addOnSuccessListener { visionText ->
+                        val hasFace = faces.isNotEmpty() || !docName.lowercase().contains("id")
+                        val hasText = visionText.textBlocks.size >= 2
+                        
+                        if (hasFace && hasText) {
+                            sendUploadResult("SUCCESS")
+                        } else {
+                            sendUploadResult("FRAUD_DETECTED")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                sendUploadResult("ERROR")
+            }
+        }
+
+        private fun sendUploadResult(status: String) {
+            runOnUiThread {
+                webView.evaluateJavascript("window.onUploadValidation('$status')", null)
+            }
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -107,7 +154,12 @@ class MainActivity : AppCompatActivity() {
                 filePathCallback?.onReceiveValue(null)
                 filePathCallback = callback
                 
-                val intent = params?.createIntent()
+                // Optimized Instant Intent
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "image/*"
+                }
+                
                 try {
                     fileChooserLauncher.launch(intent)
                 } catch (e: Exception) {

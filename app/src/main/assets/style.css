@@ -415,6 +415,63 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 .action-card:nth-child(3) i { color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow); }
 .action-card:nth-child(4) i { color: var(--neon-orange); text-shadow: 0 0 10px var(--neon-orange); }
 
+/* Loan Category Screen */
+.loan-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-top: 10px;
+}
+
+.loan-category-list::-webkit-scrollbar { width: 4px; }
+.loan-category-list::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+.cat-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.cat-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+    border-color: var(--neon-blue);
+}
+
+.cat-item i {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.cat-item div h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: white;
+}
+
+.cat-item div p {
+    margin: 3px 0 0;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    line-height: 1.2;
+}
+
 /* Success UI */
 .verified-badge { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
 .verified-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); }

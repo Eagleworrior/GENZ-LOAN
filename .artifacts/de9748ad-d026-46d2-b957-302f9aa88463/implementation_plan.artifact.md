@@ -1,55 +1,55 @@
-# KYC Stability & Persistence Final Overhaul
+# Enterprise KYC & Loan Category Overhaul
 
-This plan ensures that Identity and Liveness results are permanently saved, fixes misleading UI text during face scans, and hardens the "Real Human" verification to prevent simulations.
+Address performance issues in document uploading, implement AI-powered validation for uploaded files, and introduce a professional loan category selection screen.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **State Memory**: I am implementing a robust state recovery system. If a user completes their ID scan and closes the app, they will return directly to the Liveness check. If both are done, they go straight to the Loan Agreement.
+> **AI Validation for Uploads**: Uploaded files will now be scanned by the AI before being accepted. If you upload a photo of a car or a blank image, the AI will reject it and require a valid document.
 
-> [!NOTE]
-> **Pure Face Scan**: All references to "documents" or "scanners" have been removed from the Selfie mode. The instructions now focus strictly on proving identity through head movements.
+> [!TIP]
+> **Instant Gallery Access**: The file picker trigger is being optimized to open your phone's gallery immediately upon clicking the button, removing the previous delay.
 
 ## Proposed Changes
 
-### 1. Robust Verification Persistence (Web Layer)
+### 1. Loan Category Selection Screen (Web Layer)
+
+#### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
+- Add `#loan-category-screen` as the first screen in the loan flow.
+- Implement the requested categories (Personal, Business, Education, etc.) with unique neon icons and colors.
+- Add a Home button for easy navigation.
 
 #### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- Update `onKYCResult` to save `kycFront`, `kycBack`, and `kycCompleted` flags to `localStorage` immediately upon success.
-- Update `processLoanApplication()` to intelligently skip steps based on saved data.
-- Fix the `doc-upload` listener to ensure it triggers correctly on all Android versions.
-
-### 2. "Real-Human" Liveness Hardening (Android Native)
-
-#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
-- **UI Text Cleanup**: Remove "restoring" and "document" text in `SELFIE` mode.
-- **3D Depth Check**: Require a specific head turn (Euler Angle Y) combined with a blink to prove 3D presence and prevent photo/video spoofing.
-- **Auto-Capture Sequence**: Ensure the camera takes the final selfie photo automatically once the liveness challenges are met.
-
-#### [MODIFY] [MainActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/MainActivity.kt)
-- Final verification of the `onShowFileChooser` logic to ensure the "Upload" button consistently opens the phone's gallery.
+- Update navigation logic: Dashboard "Apply" button will now show the Category screen first.
+- Save the selected category to `currentUser`.
 
 ---
 
-### 3. Visual & Instruction Sync
+### 2. Instant Upload & AI Validation
 
-#### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
-- Synchronize guidance text to mention "Autonomous Auto-Capture" so users know they don't need to press a button.
+#### [MODIFY] [MainActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/MainActivity.kt)
+- Optimize `onShowFileChooser` to use a direct Intent, ensuring the gallery opens without delay.
+- Add a new bridge method `validateUploadedDoc(base64, docName)` to run AI checks on device files.
+
+#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
+- Export the `processDocumentDNA` logic into a reusable utility that can scan both live camera frames and static Bitmaps (uploads).
+- Strictly reject images that lack "Document DNA" (Face photo or Text density).
+
+---
+
+### 3. Liveness Instruction Cleanup
+
+#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
+- Audit all strings in `SELFIE` mode to ensure "document" is never mentioned.
 
 ## Verification Plan
 
-### Persistence Verification
-1.  Scan the front and back of an ID.
-2.  Close the app completely.
-3.  Open the app and go to "Apply Loan."
-4.  **Goal**: User must see the "Liveness" screen immediately, skipping the ID selection and scan.
+### Manual Verification
+- **Upload Test**: Tap "Upload from Device." **Goal**: Gallery must open in < 1 second.
+- **AI Fraud Test**: Upload a photo of a dog or a car. **Goal**: System must show "Invalid Document" and block the upload.
+- **Category Test**: Start a loan application. **Goal**: The first screen must be the new "Loan Category" selection.
+- **Persistence Check**: Complete the flow, close app, reopen. **Goal**: Progress must be remembered.
 
-### Liveness Verification
-1.  Point at a high-res photo of a face.
-2.  **Goal**: Challenges like "Turn Head" must fail, preventing capture.
-3.  Perform real head turns and blinks.
-4.  **Goal**: System must auto-capture and succeed.
-
-### Upload Verification
-1.  Click "Upload from Device."
-2.  **Goal**: System file picker must open.
+### Quality Check
+- Confirm all neon colors are consistent with the "GenZ Loan" aesthetic.
+- Verify Home button functionality on the new screen.

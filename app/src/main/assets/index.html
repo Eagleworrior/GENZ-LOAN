@@ -186,6 +186,128 @@
             </div>
         </div>
 
+        <!-- Loan Category Screen -->
+        <div id="loan-category-screen" class="screen">
+            <header>
+                <div class="nav-stack">
+                    <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
+                </div>
+                <h2>Loan Category</h2>
+            </header>
+            <div class="card glass">
+                <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 20px; text-align: center;">
+                    Select the purpose of your loan to proceed with your application.
+                </p>
+                <div class="loan-category-list">
+                    <div class="cat-item" onclick="selectLoanCategory('Personal', 'fa-user-tie', 'var(--neon-blue)')">
+                        <i class="fa-solid fa-user-tie" style="color: var(--neon-blue)"></i>
+                        <div>
+                            <h4>Personal Loans</h4>
+                            <p>Everyday needs, bills, shopping, emergencies.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Business', 'fa-building', 'var(--neon-pink)')">
+                        <i class="fa-solid fa-building" style="color: var(--neon-pink)"></i>
+                        <div>
+                            <h4>Business Loans</h4>
+                            <p>Boost capital, stock purchase, expansion.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Education', 'fa-graduation-cap', 'var(--neon-yellow)')">
+                        <i class="fa-solid fa-graduation-cap" style="color: var(--neon-yellow)"></i>
+                        <div>
+                            <h4>Education Loans</h4>
+                            <p>School fees, college, university support.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Emergency', 'fa-ambulance', 'var(--neon-orange)')">
+                        <i class="fa-solid fa-ambulance" style="color: var(--neon-orange)"></i>
+                        <div>
+                            <h4>Medical Loans</h4>
+                            <p>Urgent health or family emergencies.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Housing', 'fa-house-lock', 'var(--accent-cyan)')">
+                        <i class="fa-solid fa-house-lock" style="color: var(--accent-cyan)"></i>
+                        <div>
+                            <h4>Housing / Rent</h4>
+                            <p>Rent, home repairs, relocation costs.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Debt', 'fa-credit-card', 'var(--accent-emerald)')">
+                        <i class="fa-solid fa-credit-card" style="color: var(--accent-emerald)"></i>
+                        <div>
+                            <h4>Debt Consolidation</h4>
+                            <p>Merge debts into one manageable payment.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Asset', 'fa-car', 'var(--neon-blue)')">
+                        <i class="fa-solid fa-car" style="color: var(--neon-blue)"></i>
+                        <div>
+                            <h4>Asset / Vehicle</h4>
+                            <p>Cars, motorbikes, equipment financing.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Salary', 'fa-money-bill-trend-up', 'var(--neon-pink)')">
+                        <i class="fa-solid fa-money-bill-trend-up" style="color: var(--neon-pink)"></i>
+                        <div>
+                            <h4>Salary Advance</h4>
+                            <p>Access part of salary before payday.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Logbook', 'fa-book-open-reader', 'var(--neon-yellow)')">
+                        <i class="fa-solid fa-book-open-reader" style="color: var(--neon-yellow)"></i>
+                        <div>
+                            <h4>Logbook Loans</h4>
+                            <p>Secure financing using car logbook.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Title Deed', 'fa-file-invoice', 'var(--neon-orange)')">
+                        <i class="fa-solid fa-file-invoice" style="color: var(--neon-orange)"></i>
+                        <div>
+                            <h4>Title Deed Loans</h4>
+                            <p>Loans backed by land or property deeds.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Construction', 'fa-trowel-bricks', 'var(--accent-cyan)')">
+                        <i class="fa-solid fa-trowel-bricks" style="color: var(--accent-cyan)"></i>
+                        <div>
+                            <h4>Construction</h4>
+                            <p>Build or renovate homes and projects.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Agricultural', 'fa-wheat-awn', 'var(--accent-emerald)')">
+                        <i class="fa-solid fa-wheat-awn" style="color: var(--accent-emerald)"></i>
+                        <div>
+                            <h4>Agricultural</h4>
+                            <p>Farming, seeds, equipment, agribusiness.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Consumer', 'fa-cart-shopping', 'var(--neon-blue)')">
+                        <i class="fa-solid fa-cart-shopping" style="color: var(--neon-blue)"></i>
+                        <div>
+                            <h4>Consumer Loans</h4>
+                            <p>Electronics, furniture, household items.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Travel', 'fa-plane-departure', 'var(--neon-pink)')">
+                        <i class="fa-solid fa-plane-departure" style="color: var(--neon-pink)"></i>
+                        <div>
+                            <h4>Travel Loans</h4>
+                            <p>Cover trips, vacations, or relocation.</p>
+                        </div>
+                    </div>
+                    <div class="cat-item" onclick="selectLoanCategory('Mobile', 'fa-mobile-screen', 'var(--neon-yellow)')">
+                        <i class="fa-solid fa-mobile-screen" style="color: var(--neon-yellow)"></i>
+                        <div>
+                            <h4>Mobile Loans</h4>
+                            <p>Instant mobile wallet disbursement.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Loan Application Screen -->
         <div id="apply-screen" class="screen">
             <header>

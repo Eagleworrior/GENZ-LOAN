@@ -876,8 +876,15 @@ document.getElementById('btn-apply').addEventListener('click', () => {
         }
     }
 
-    showScreen('apply-screen');
+    showScreen('loan-category-screen'); // Category selection first
 });
+
+function selectLoanCategory(name, icon, color) {
+    currentUser.loanCategory = name;
+    saveState();
+    showToast(`Category: ${name} selected.`, "success");
+    showScreen('apply-screen');
+}
 
 const DOCUMENT_TYPES = {
     "Government Identity": [
@@ -956,31 +963,46 @@ document.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
 
-        showToast("Processing file...", "info");
+        showToast("AI Scanning uploaded document...", "info");
 
         const reader = new FileReader();
         reader.onload = function(event) {
             try {
-                currentUser.uploadedDoc = event.target.result;
+                const base64 = event.target.result;
+                currentUser.uploadedDoc = base64;
                 currentUser.kycFront = "UPL_" + Date.now();
                 saveState();
-                showToast("Document received! Starting face scan.", "success");
 
-                // Switch screen instantly
-                setTimeout(() => showScreen('kyc-liveness-screen'), 500);
+                // Trigger Native AI Validation
+                if (typeof AndroidKYC !== 'undefined') {
+                    AndroidKYC.validateUploadedDoc(base64, selectedDoc?.name || "Document");
+                } else {
+                    // Fallback for web testing
+                    setTimeout(() => showScreen('kyc-liveness-screen'), 800);
+                }
             } catch (err) {
                 console.error("Upload process error:", err);
                 showToast("Failed to process file. Try a photo.", "error");
             }
         };
 
-        reader.onerror = function() {
-            showToast("Error reading file.", "error");
-        };
-
         reader.readAsDataURL(file);
     }
 });
+
+// AI Upload Validation Callback from Native
+window.onUploadValidation = function(status) {
+    if (status === "SUCCESS") {
+        showToast("Document verified! Moving to identity scan.", "success");
+        setTimeout(() => showScreen('kyc-liveness-screen'), 600);
+    } else if (status === "FRAUD_DETECTED") {
+        showToast("Invalid Document: Please upload a clear ID or Passport.", "error");
+        currentUser.uploadedDoc = null;
+        currentUser.kycFront = null;
+    } else {
+        showToast("Error verifying document. Please try taking a photo.", "error");
+    }
+};
 
 document.getElementById('doc-search')?.addEventListener('input', (e) => renderDocSelector(e.target.value));
 

@@ -1,18 +1,16 @@
-# Task: KYC Persistence & Liveness Stability Overhaul
+# Task: Enterprise KYC & Loan Category Implementation
 
-Ensuring progress is saved, UI text is accurate, and liveness detection is unhackable.
+Optimizing upload speed, implementing AI upload validation, and adding the Loan Category selection screen.
 
-- `[/]` Phase 1: Persistence Logic Hardening
-    - `[ ]` Update `app.js` to save KYC flags in `localStorage`.
-    - `[ ]` Update `processLoanApplication` for smart step skipping.
-- `[ ]` Phase 2: Liveness Hardening (Native)
-    - `[ ]` Remove "document" text from `SELFIE` mode in `KYCActivity.kt`.
-    - `[ ]` Implement 3D "Head Turn" requirement for anti-simulation.
-    - `[ ]` Ensure auto-capture trigger on liveness finish.
-- `[ ]` Phase 3: Final Bridge & Upload Polish
-    - `[ ]` Verify `onShowFileChooser` in `MainActivity.kt`.
-    - `[ ]` Update `index.html` guidance text.
-- `[ ]` Phase 4: Final Verification
-    - `[ ]` Test Persistence (Close/Reopen).
-    - `[ ]` Test Anti-Spoof (Photo test).
-    - `[ ]` Final push.
+- `[/]` Phase 1: Native Performance & AI Validation
+    - `[ ]` Optimize `onShowFileChooser` in `MainActivity.kt` for instant access.
+    - `[ ]` Add `validateUploadedDoc` bridge method.
+    - `[ ]` Refactor `KYCActivity.kt` to allow AI scanning of static Bitmaps (uploads).
+- `[/]` Phase 2: Web UI & Navigation
+    - `[ ]` Create `#loan-category-screen` in `index.html`.
+    - `[ ]` Style loan categories with neon icons and professional layout in `style.css`.
+    - `[ ]` Update `app.js` navigation flow and selected category persistence.
+- `[/]` Phase 3: Final Polish
+    - `[ ]` Audit liveness instructions to remove "document" text.
+    - `[ ]` Verify upload-to-liveness transition with AI guard.
+    - `[ ]` Final Signed APK.
