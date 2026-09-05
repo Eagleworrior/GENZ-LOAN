@@ -959,7 +959,7 @@ document.getElementById('btn-continue-kyc')?.addEventListener('click', () => {
 // Bridge Functions
 function launchNativeKYC() {
     if (typeof AndroidKYC !== 'undefined') {
-        AndroidKYC.startVerification("DOCUMENT", selectedDoc?.name || "");
+        AndroidKYC.startVerification("DOCUMENT", selectedDoc?.name || "", currentUser.name, currentUser.country);
     } else {
         showToast("Secure Camera requires the official Android App.", "error");
     }
@@ -967,7 +967,7 @@ function launchNativeKYC() {
 
 function launchNativeLiveness() {
     if (typeof AndroidKYC !== 'undefined') {
-        AndroidKYC.startVerification("SELFIE");
+        AndroidKYC.startVerification("SELFIE", "", currentUser.name, currentUser.country);
     } else {
         showToast("Video Liveness requires the official Android App.", "error");
     }

@@ -1,11 +1,11 @@
-# Task: High-Security Identity Verification Implementation
+# Task: Strict Identity Verification & Bug Fixes
 
-Implementing a professional-grade, anti-fraud KYC system with video liveness and global document support.
+Fixing liveness trigger, blank capture issues, and adding account-document cross-validation.
 
-- `[x]` Phase 1: Foundation & Dependencies
-- `[x]` Phase 2: Security Intelligence (Native)
-- `[x]` Phase 3: Global Document Hub (Web UI)
-- `[x]` Phase 4: Guided Video Liveness
-- `[/]` Phase 5: Verification & Delivery
-    - `[ ]` Perform "Fraud Simulation" tests (Laptop screen, Printed photo).
-    - `[x]` Final build and Signed APK generation.
+- `[x]` Phase 1: Security Engine Hardening
+- `[x]` Phase 2: Native Logic Enhancements
+- `[x]` Phase 3: Web UI Polish
+- `[/]` Phase 4: Final Verification
+    - `[ ]` Verify name matching with 2 vs 3 name variations.
+    - `[ ]` Verify blank/fake document blocking.
+    - `[ ]` Test "Start Video Selfie" trigger.

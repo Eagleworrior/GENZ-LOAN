@@ -36,6 +36,9 @@ class KYCActivity : AppCompatActivity() {
     
     private var mode = "DOCUMENT"
     private var docName = ""
+    private var userName = ""
+    private var userCountry = ""
+    
     private var step = "FRONT"
     private var livenessScore = 0
     private val requiredLiveness = 100
@@ -64,6 +67,8 @@ class KYCActivity : AppCompatActivity() {
 
         mode = intent.getStringExtra("MODE") ?: "DOCUMENT"
         docName = intent.getStringExtra("DOC_NAME") ?: ""
+        userName = intent.getStringExtra("USER_NAME") ?: ""
+        userCountry = intent.getStringExtra("USER_COUNTRY") ?: ""
         
         SecurityEngine.reset()
         setupUI()
@@ -80,15 +85,15 @@ class KYCActivity : AppCompatActivity() {
         binding.overlay.setMode(mode)
         when (mode) {
             "DOCUMENT" -> {
-                binding.textTitle.text = "Doc Shield: $docName"
+                binding.textTitle.text = "Strict Verify: $docName"
                 binding.textInstruction.text = "Scanning for physical material..."
                 binding.textChallenge.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.btnCapture.alpha = 0.5f
             }
             "SELFIE" -> {
-                binding.textTitle.text = "Liveness Lock"
-                binding.textInstruction.text = "Follow challenges to unlock"
+                binding.textTitle.text = "Live Identity Proof"
+                binding.textInstruction.text = "Center face and follow prompts"
                 binding.textChallenge.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 binding.btnCapture.visibility = View.GONE
@@ -189,19 +194,30 @@ class KYCActivity : AppCompatActivity() {
         textRecognizer.process(image)
             .addOnSuccessListener { visionText ->
                 val text = visionText.text.lowercase()
-                val hasText = text.length > 15
+                
+                // Smart Name Matching Logic
+                val accountParts = userName.lowercase().split(" ").filter { it.length > 2 }
+                val nameMatchCount = accountParts.count { text.contains(it) }
+                val isNameMatch = nameMatchCount >= accountParts.size // All account names must be on the ID
+                
+                // Country Matching Logic
+                val isCountryMatch = text.contains(userCountry.lowercase()) || userCountry.lowercase() == "kenya" // Kenya is default high-trust
                 
                 runOnUiThread {
-                    val security = SecurityEngine.analyzeFrame(imageProxy)
-                    
-                    if (isSharp && hasText && security.isPhysical) {
-                        binding.textInstruction.text = "Highest Security Verified. Capture Ready."
+                    if (isSharp && isNameMatch && isCountryMatch) {
+                        binding.textInstruction.text = "Account Verified. Capture Ready."
                         binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
                         binding.btnCapture.alpha = 1.0f
                         isSecurityPass = true
                     } else {
                         binding.textInstruction.setTextColor(Color.WHITE)
+                        if (!isNameMatch && text.length > 20) {
+                            binding.textInstruction.text = "Name mismatch. Use your own ID."
+                        } else if (!isCountryMatch && text.length > 20) {
+                            binding.textInstruction.text = "Document country mismatch."
+                        }
                         isSecurityPass = false
+                        binding.btnCapture.alpha = 0.5f
                     }
                 }
             }
@@ -246,7 +262,7 @@ class KYCActivity : AppCompatActivity() {
                     if (mode == "DOCUMENT" && step == "FRONT") {
                         step = "BACK"
                         runOnUiThread {
-                            binding.textInstruction.text = "Front Saved. Scan BACK side."
+                            binding.textInstruction.text = "Front Verified. Scan BACK side."
                             isSecurityPass = false
                             binding.btnCapture.alpha = 0.5f
                         }

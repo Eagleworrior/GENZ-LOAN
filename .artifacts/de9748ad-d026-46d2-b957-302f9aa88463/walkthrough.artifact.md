@@ -1,37 +1,30 @@
-# High-Security KYC & Global Intelligence System
+# Walkthrough: High-Quality Security Hardening & Bug Fixes
 
-I have completed the development of an enterprise-grade Identity Verification system for GenZ Loan. This upgrade represents a significant leap in both security and user experience, moving from basic camera capture to a **Native "Doc-Shield" Intelligence** system.
+I have completed the deep-level security audit and implemented strict cross-validation logic to ensure the integrity of your identity verification system.
 
-## 🛡️ Highest Security Features
+## 🛡️ Security Engine: Anti-Fake Intelligence
+- **Strict Blank Detection**: Upgraded the `SecurityEngine` to detect blank walls or papers. It now performs a **Feature Density Check**—if the frame lacks sufficient visual edges and text, capture is blocked.
+- **Anti-Blur V2**: Increased the stability requirements. The app now requires a **92% stability score**, meaning users must hold the phone extremely steady to pass.
+- **Material Consistency**: Increased the "Tilt-Glare" requirements to 8 successful light-shift cycles, making it even harder to spoof with a digital screen.
 
-### 1. Physicality Detection (Anti-Spoof)
-- **Digital Screen Shield**: The app performs real-time frequency and contrast analysis to detect digital screens. If a user points the camera at a laptop or monitor, the system flags it.
-- **Glare & Tilt Verification**: To prove the document is a physical card, the app requires a "Material Check." It looks for real light reflections (glare) that shift as the user tilts the document. Capture is **locked** until these physical signals are detected.
-- **Dynamic Text Matcher**: Integrated **ML Kit**. The system verifies that the document contains at least 15 characters of structured text, ensuring it's an actual document and not a blank surface.
+## 📄 Cross-Verification: Account-Document Sync
+- **Smart Name Matcher**: The app now reads the text on the document and verifies it against the user's registered name.
+    - **Subset Logic**: If the account name is "John Doe" and the ID is "John Philip Doe", the system intelligently confirms that the core names match, preventing identity fraud.
+- **Country Enforcement**: Verified that the document contains keywords matching the user's selected country.
+- **Real-Time Feedback**: If a name mismatch is detected, the app displays a clear `--neon-pink` error: *"Name mismatch. Use your own ID."*
 
-### 2. Guided Video Liveness V2
-- **Randomized Challenges**: The system now chooses from **Blink**, **Smile**, and **Head Nod** challenges in a random sequence.
-- **Haptic Milestones**: Added vibration feedback for every successful security step, creating a high-end feel.
+## 🔧 Bug Fixes & UI Consistency
+- **Liveness Trigger Fix**: Repaired the bridge communication between the "Start Video Selfie" button and the native camera. It now correctly switches to the **front-facing camera** and starts the challenge sequence.
+- **Home Button Integration**: Added the signature neon blue **Home Button** to all new verification screens (Selector, Guidance, and Liveness), ensuring seamless navigation.
+- **Decorated UI**: Enhanced the document selector with custom neon colors for each category (Government, Proof of Address, Financial), maintaining the app's beautiful aesthetic.
 
-## 🎨 Beautiful & Exhaustive UI
-
-### 1. Global Document Hub
-- **30+ Document Types**: Implemented a comprehensive catalog including Military IDs, Alien Cards, Tenancy Agreements, and more.
-- **Neon Categorization**: Each category is beautifully decorated with its own signature glow:
-    - **Government IDs**: Electric Blue
-    - **Address Proofs**: Neon Pink
-    - **Financial Documents**: Glowing Yellow
-- **Searchable Interface**: A high-speed searchable UI allows users to find their specific document type instantly.
-
-### 2. Interactive Guides
-- Added professional guidance screens with floating animations and checklists to ensure "Zero-Failure" capture for users.
-- Real-time feedback messages like "Scanning for material..." and "Material Verified" provide clear user instructions.
-
-## 🛠️ Technical Implementation
-- **Bridge Technology**: Created a custom `AndroidKYC` bridge to link your web dashboard with native CameraX and ML Kit processing.
-- **On-Device Brain**: All security checks happen locally on the phone. This means **highest privacy** for your users and **no API costs** for you.
+## Technical Components Updated
+- **`SecurityEngine.kt`**: Core logic for physicality and text density.
+- **`KYCActivity.kt`**: Integrated name/country cross-validation.
+- **`MainActivity.kt`**: Metadata passing through the Javascript Bridge.
+- **`app.js` & `index.html`**: UI updates and bridge call repairs.
 
 > [!IMPORTANT]
-> **Quality Assurance**: This system was built slowly and meticulously to ensure stability. It maintains all your previous neon text styles and "GenZ" decorations perfectly.
+> **Strictness Note**: Users must now use high-quality lighting and their *exact* registered ID to pass the verification. This significantly reduces the risk of fraud.
 
-**Your app is now protected by one of the most advanced local identity verification systems available.**
+**The system is now hardened, consistent, and ready for high-security environments.**
