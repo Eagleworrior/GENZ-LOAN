@@ -89,23 +89,23 @@ class KYCActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
-        binding.btnCapture.visibility = View.GONE // Fully autonomous
+        binding.btnCapture.visibility = View.GONE 
     }
 
     private fun setupUI() {
         binding.overlay.setMode(mode)
         when (mode) {
             "DOCUMENT" -> {
-                binding.textTitle.text = "Document Feature AI"
+                binding.textTitle.text = "Restoring Feature Guard..."
                 binding.textTitle.setTextColor(Color.parseColor("#00ff88"))
                 binding.textInstruction.text = "Initializing Scanner..."
                 binding.textChallenge.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
             }
             "SELFIE" -> {
-                binding.textTitle.text = "Live Identity Verification"
+                binding.textTitle.text = "Identity Liveness Proof"
                 binding.textTitle.setTextColor(Color.parseColor("#f3ff00"))
-                binding.textInstruction.text = "Follow prompts clearly"
+                binding.textInstruction.text = "Follow prompts carefully"
                 binding.textChallenge.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 updateChallenge()
@@ -118,8 +118,8 @@ class KYCActivity : AppCompatActivity() {
         currentChallenge = challenges.random()
         binding.textChallenge.text = when (currentChallenge) {
             "BLINK" -> "Action: BLINK BOTH EYES"
-            "SMILE" -> "Action: GIVE A BIG SMILE"
-            "NOD" -> "Action: NOD YOUR HEAD SLIGHTLY"
+            "SMILE" -> "Action: SMILE BIG"
+            "NOD" -> "Action: NOD HEAD SLIGHTLY"
             else -> ""
         }
     }
@@ -153,7 +153,7 @@ class KYCActivity : AppCompatActivity() {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, analyzer)
             } catch (exc: Exception) {
-                Log.e("KYC", "Hardware link failed", exc)
+                Log.e("KYC", "Lifecycle link fail", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -166,24 +166,26 @@ class KYCActivity : AppCompatActivity() {
             return
         }
 
-        val mediaImage = imageProxy.image ?: return
+        val mediaImage = imageProxy.image
+        if (mediaImage == null) {
+            imageProxy.close()
+            return
+        }
         val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
-        // 1. Security Check
+        // 1. Physicality & Clarity
         val security = SecurityEngine.analyzeFrame(imageProxy)
         
         runOnUiThread {
             if (!isSecurityPass) {
                 binding.textInstruction.text = security.message
-                binding.textInstruction.setTextColor(Color.WHITE)
             }
             binding.progressBar.progress = security.score
-            
             val status = if (isSecurityPass) "GREEN" else if (security.score > 25) "YELLOW" else "RED"
             binding.overlay.setStatus(status)
         }
 
-        // 2. Intelligence Processing
+        // 2. DNA / Liveness
         if (mode == "SELFIE") {
             processFace(inputImage, imageProxy)
         } else {
@@ -197,36 +199,30 @@ class KYCActivity : AppCompatActivity() {
                 if (faces.isNotEmpty()) {
                     val face = faces[0]
                     when (currentChallenge) {
-                        "BLINK" -> if ((face.leftEyeOpenProbability ?: 1.0f) < 0.15f) handleChallengeSuccess()
-                        "SMILE" -> if ((face.smilingProbability ?: 0.0f) > 0.85f) handleChallengeSuccess()
-                        "NOD" -> if (Math.abs(face.headEulerAngleX) > 15f) handleChallengeSuccess()
+                        // Relaxed thresholds for better user experience
+                        "BLINK" -> if ((face.leftEyeOpenProbability ?: 1.0f) < 0.30f) handleChallengeSuccess()
+                        "SMILE" -> if ((face.smilingProbability ?: 0.0f) > 0.65f) handleChallengeSuccess()
+                        "NOD" -> if (Math.abs(face.headEulerAngleX) > 12f) handleChallengeSuccess()
                     }
                 }
             }
+            .addOnFailureListener { Log.e("KYC", "Face detect fail", it) }
             .addOnCompleteListener { imageProxy.close() }
     }
 
     private fun processDocumentDNA(image: InputImage, imageProxy: ImageProxy, security: SecurityEngine.SecurityResult) {
-        // Run Face Detection (Small Photo on ID) and Text Recognition in parallel
+        // Parallel checks for Face-on-Card and Text density
         faceDetector.process(image).addOnSuccessListener { faces ->
             textRecognizer.process(image).addOnSuccessListener { visionText ->
-                val text = visionText.text.lowercase()
-                
-                // RESTORED: DNA Feature Checks
-                val hasPhoto = faces.isNotEmpty() || !docName.lowercase().contains("id") // Required for IDs
+                val hasPhoto = faces.isNotEmpty() || !docName.lowercase().contains("id")
                 val hasTextDensity = visionText.textBlocks.size >= 2
-                
-                // USER-FRIENDLY: Optional matching (Bonus only)
-                val accountNames = userName.lowercase().split(" ").filter { it.length > 2 }
-                val isNameMatch = if (accountNames.isEmpty()) true else accountNames.all { text.contains(it) }
                 
                 runOnUiThread {
                     if (security.isSharp && security.isPhysical && hasTextDensity && hasPhoto) {
-                        binding.textInstruction.text = if (isNameMatch) "Identity Verified. Capturing..." else "Document Verified. Capturing..."
+                        binding.textInstruction.text = "Document Verified. Auto-capturing..."
                         binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
                         isSecurityPass = true
                         
-                        // Extra-Snappy trigger (0.3s)
                         if (autoCaptureStartTime == 0L) {
                             autoCaptureStartTime = System.currentTimeMillis()
                         } else if (System.currentTimeMillis() - autoCaptureStartTime > 300) {
@@ -235,15 +231,15 @@ class KYCActivity : AppCompatActivity() {
                     } else {
                         isSecurityPass = false
                         autoCaptureStartTime = 0L
-                        if (!hasTextDensity && security.score > 20) {
-                            binding.textInstruction.text = "Align document features in frame."
-                        } else if (!hasPhoto && docName.lowercase().contains("id") && security.score > 30) {
+                        if (!hasTextDensity && security.score > 30) {
+                            binding.textInstruction.text = "Align document features clearly."
+                        } else if (!hasPhoto && docName.lowercase().contains("id") && security.score > 40) {
                             binding.textInstruction.text = "Ensure ID photo is visible."
                         }
                     }
                 }
             }.addOnCompleteListener { imageProxy.close() }
-        }
+        }.addOnFailureListener { imageProxy.close() }
     }
 
     private fun handleChallengeSuccess() {
@@ -280,7 +276,6 @@ class KYCActivity : AppCompatActivity() {
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), 
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e("KYC", "Capture Error: ${exc.message}")
                     isCapturing = false
                 }
 

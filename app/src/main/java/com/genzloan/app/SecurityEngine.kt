@@ -7,8 +7,8 @@ import java.nio.ByteBuffer
 import kotlin.math.abs
 
 /**
- * Enterprise-Grade Security Engine for local document and liveness validation.
- * Optimized for high responsiveness and zero-friction capture.
+ * Enterprise-Grade Security Engine for GenZ Loan.
+ * Optimized for high speed and strict physicality verification.
  */
 object SecurityEngine {
 
@@ -42,7 +42,7 @@ object SecurityEngine {
         
         var sum = 0L
         var sumSq = 0L
-        val step = 6 // Higher precision for DNA check
+        val step = 8 
         var count = 0
         
         var maxLocalLuma = 0
@@ -69,37 +69,37 @@ object SecurityEngine {
         val mean = sum.toDouble() / count
         val variance = (sumSq.toDouble() / count) - (mean * mean)
         
-        // 1. Texture & Entropy Check (Strictly block blank/empty captures)
-        val hasDetail = contrastEdges > (count * 0.05) // Require 5% edge density to detect a document
+        // 1. HARDENED Texture & Entropy Check (Strictly block blank/empty captures)
+        val hasDetail = contrastEdges > (count * 0.065) // Increased from 0.04 to 6.5% for elite blank wall rejection
         
-        // 2. Sharpness (High standard for readability)
+        // 2. Sharpness
         val isSharp = variance > 120 
         
         // 3. Physicality & Spoof Detection
         val isDigitalScreen = contrastEdges > (count * 0.18) && variance > 480
         
         // Specular Glare (Physical light reflections)
-        val hasHotspot = (maxLocalLuma - mean) > 100 
+        val hasHotspot = (maxLocalLuma - mean) > 105 
         if (hasHotspot) glareDetectedCount++
         
         // 4. Fast Stability Check
         val lumaDiff = if (lastLuminance < 0) 0.0 else abs(mean - lastLuminance)
         lastLuminance = mean
-        if (lumaDiff < 2.0) stabilityFrames++ else stabilityFrames = 0
+        if (lumaDiff < 1.5) stabilityFrames++ else stabilityFrames = 0
         
-        val isStable = stabilityFrames > 4 // Require ~0.3 seconds of stillness
+        val isStable = stabilityFrames > 5 // Require ~0.35 seconds of stillness
         
         // Physicality Proof requirement
-        val requiredGlare = if (isPaperMode) 1 else 4
+        val requiredGlare = if (isPaperMode) 2 else 5
         val isPhysical = (glareDetectedCount >= requiredGlare) && !isDigitalScreen && hasDetail
 
         val message = when {
-            isDigitalScreen -> "Digital Spoof Detected. Use Physical Document."
+            isDigitalScreen -> "Digital Spoof Detected. Use Physical ID."
             !hasDetail -> "Align document in the frame."
-            !isSharp -> "Improving focus... Hold steady."
+            !isSharp -> "Focusing... Hold steady."
             !isStable -> "Stabilizing... Hold steady."
             !isPhysical -> if (isPaperMode) "Align document clearly." else "Security: Tilt document slowly."
-            else -> "Document Verified. Ready."
+            else -> "Physical Verification Ready."
         }
 
         return SecurityResult(

@@ -1,51 +1,53 @@
-# Document DNA AI: Intelligent Physicality & Feature Detection
+# Critical KYC Fixes: Functional Upload & Reliable Liveness
 
-Restore the advanced AI features that verify the authenticity of the physical card and its structural features, while removing the strict "Account Matching" barriers that cause user frustration.
+Address the issues where the device upload is non-responsive and the video selfie fails to complete, while hardening the auto-capture to prevent false triggers.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Document Layout AI**: The system will now look for "Document DNA"—specifically, it will scan for a photo (face) and text density on the card. If you point it at a blank wall or a piece of furniture, it will **NOT** capture, even if the light is green.
+> **WebView File Access**: I am adding the `onShowFileChooser` handler to the Android `MainActivity`. This is a system-level requirement for the "Upload from Device" button to actually open the phone's gallery.
 
 > [!TIP]
-> **Flexible Validation**: I am removing the hard block on Name/ID/DOB matching. If the details match, it's a bonus, but if the AI can't perfectly read them, it will **STILL** allow the capture as long as the document is real and clear.
+> **Liveness Calibration**: I am slightly relaxing the facial expression thresholds (blink/smile) to ensure the AI detects them more easily, and I'm ensuring the capture happens instantly when the score is reached.
 
 ## Proposed Changes
 
-### 1. Document DNA AI (Android Native)
+### 1. Functional Device Upload (Android Native)
+
+#### [MODIFY] [MainActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/MainActivity.kt)
+- Implement `onShowFileChooser` in the `WebChromeClient`.
+- Add an `ActivityResultLauncher` to handle the file selection result from the system gallery.
+- Return the file URI back to the WebView so `app.js` can process it.
+
+---
+
+### 2. Reliable Video Selfie (Android Native)
 
 #### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
-- **Face-on-Card Detection**: In "National ID" mode, use the face detector on the document. A real ID must contain a small photo (a face).
-- **Text Block Density**: Verify that the document contains at least 3 distinct blocks of text (Name, Number, Date, etc.) to ensure it's not just a blank paper.
-- **Removed Account Barrier**: Account details (`userName`, `userIDNum`) will be checked, but failure to match will **NOT** block the capture. It will only show a "Scanning..." status.
+- **Refined Face AI**:
+    - Relax BLINK threshold to `< 0.25` (was 0.15).
+    - Relax SMILE threshold to `> 0.7` (was 0.85).
+- **Harden Analyzer**: Ensure `imageProxy` is closed in *every* code path (Success, Failure, and Completion) to prevent the camera from freezing.
+- **DNA Protection**: Increase the required "Edge Density" in document mode to strictly block blank surfaces/walls.
 
 #### [MODIFY] [SecurityEngine.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/SecurityEngine.kt)
-- **Hardened Entropy Shield**: Increase the required edge density to 5%. This ensures that even a clear white wall is rejected.
-- **Physicality DNA**: Require a shifting glare pattern to prove the document is plastic/paper and not a static image.
+- **Entropy Harden**: Increase `hasDetail` threshold to `0.06` (6%) to ensure blank walls never trigger a "Green" state.
 
 ---
 
-### 2. High-Speed Auto-Capture (0.3s)
-
-#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
-- **Instant Trigger**: Reduce the sustained pass window to 300ms. As soon as the "Document DNA" is confirmed, the photo is taken.
-- **Haptic Signal**: A short pulse when DNA is detected, and a long pulse when captured.
-
----
-
-### 3. UI & Upload Fixes
+### 3. UI & UX Polish (Web Layer)
 
 #### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- **Upload Resilience**: Ensure the upload handler uses a more robust file reader to handle high-res photos from modern device galleries.
+- Ensure the upload handler specifically handles the `change` event for the file input.
+- Add a loading spinner when a file is being processed.
 
 ## Verification Plan
 
-### The "Reality" Test
-1.  **Blank Wall Test**: Point camera at a wall. **Goal**: Must NOT capture.
-2.  **Blank Paper Test**: Point at a plain white A4 paper. **Goal**: Must NOT capture (missing text/DNA).
-3.  **Real ID Test**: Point at a real card. **Goal**: Must capture in < 0.5s.
-4.  **Mismatch Test**: Use a real ID with a different name. **Goal**: Must capture successfully (since barriers are removed).
+### Manual Verification
+- **Upload Test**: Press "Upload from Device." **Goal**: The system file picker must open, allow selecting an image, and proceed to liveness.
+- **Selfie Test**: Follow blink/smile prompts. **Goal**: The progress bar must fill up and finish automatically.
+- **Blank Test**: Point at a white wall. **Goal**: The frame must stay RED or YELLOW and never auto-capture.
 
 ### Quality Check
-- Confirm "Turn Card" prompt appears for ID types.
-- Confirm Home button is present on all screens.
+- Confirm Home button works on every screen.
+- Confirm the app doesn't freeze after a few seconds of use.

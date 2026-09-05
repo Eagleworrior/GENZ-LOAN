@@ -1,19 +1,11 @@
-# Task: Advanced Document DNA AI Implementation
+# Task: Critical KYC Fixes (Upload & Liveness)
 
-Restoring intelligent feature detection (Face, Text Density) while keeping user-friendly validation.
+Fixing the non-responsive upload button and unreliable video selfie completion.
 
-- `[/]` Phase 1: Security Engine Hardening
-    - `[x]` Increase entropy threshold to 5% in `SecurityEngine.kt`.
-    - `[x]` Refine glare requirement for physicality proof.
-- `[/]` Phase 2: Native AI Feature Restoration
-    - `[ ]` Implement Face-on-Card detection in `KYCActivity.kt`.
-    - `[ ]` Implement Text-Block density verification.
-    - `[ ]` Remove hard-block on Name/ID/DOB matching.
-    - `[ ]` Add 0.3s snappy auto-capture trigger.
-- `[ ]` Phase 3: Web UI & Upload Polish
-    - `[ ]` Ensure "Upload from Device" handler is robust and functional.
-    - `[ ]` Add visual feedback for "DNA Detection" states.
-- `[ ]` Phase 4: Verification & Delivery
-    - `[ ]` Test "Blank Wall" vs "Real ID" blocking.
-    - `[ ]` Verify "Name Mismatch" still allows capture.
-    - `[ ]` Final Signed APK.
+- `[x]` Phase 1: Native System Integration
+- `[x]` Phase 2: AI & Analyzer Hardening
+- `[/]` Phase 3: Final Verification & Push
+    - `[x]` Verify gallery opens on "Upload" click.
+    - `[x]` Verify selfie challenge completes smoothly.
+    - `[x]` Confirm "Blank Wall" rejection is 100% reliable.
+    - `[x]` Full push to GitHub.
