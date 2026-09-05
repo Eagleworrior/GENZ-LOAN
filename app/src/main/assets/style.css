@@ -856,6 +856,38 @@ select option { background: var(--bg-light); color: white; }
     box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
 }
 
+/* Upload UI Decor */
+.upload-option-divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    font-weight: bold;
+    opacity: 0.6;
+}
+
+.upload-option-divider::before, .upload-option-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
+}
+
+.upload-btn {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px dashed var(--neon-blue) !important;
+    color: var(--neon-blue) !important;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.upload-btn:hover {
+    background: rgba(0, 210, 255, 0.05) !important;
+    border-style: solid !important;
+}
+
 /* Guidance UI */
 .guidance-icon-box {
     width: 100px;

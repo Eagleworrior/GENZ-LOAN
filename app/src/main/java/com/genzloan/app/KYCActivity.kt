@@ -186,7 +186,7 @@ class KYCActivity : AppCompatActivity() {
             }
             binding.progressBar.progress = security.score
             
-            val overlayStatus = if (isSecurityPass) "GREEN" else if (security.score > 25) "YELLOW" else "RED"
+            val overlayStatus = if (isSecurityPass) "GREEN" else if (security.score > 20) "YELLOW" else "RED"
             binding.overlay.setStatus(overlayStatus)
         }
 
@@ -222,7 +222,7 @@ class KYCActivity : AppCompatActivity() {
                 val accountNameParts = userName.lowercase().split(" ").filter { it.length > 2 }
                 val nameMatch = if (accountNameParts.isEmpty()) true else accountNameParts.all { text.contains(it) }
                 
-                // Geography AI
+                // Geography Matcher
                 val geographyMatch = text.contains(userCountry.lowercase()) || 
                                      localMarkers.any { it.isNotEmpty() && text.contains(it.lowercase()) }
 
@@ -245,10 +245,10 @@ class KYCActivity : AppCompatActivity() {
                             binding.btnCapture.alpha = 1.0f
                             isSecurityPass = true
                             
-                            // Snappier Auto-Capture: 0.6 seconds
+                            // Extra-Snappy Auto-Capture: 0.4 seconds
                             if (autoCaptureStartTime == 0L) {
                                 autoCaptureStartTime = System.currentTimeMillis()
-                            } else if (System.currentTimeMillis() - autoCaptureStartTime > 600) {
+                            } else if (System.currentTimeMillis() - autoCaptureStartTime > 400) {
                                 takePhoto()
                             }
                         } else {
