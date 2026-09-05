@@ -38,9 +38,6 @@ class KYCActivity : AppCompatActivity() {
     private var docName = ""
     private var userName = ""
     private var userCountry = ""
-    private var userIDNum = ""
-    private var userDOB = ""
-    private var localMarkers = listOf<String>()
     
     private var step = "FRONT"
     private var livenessScore = 0
@@ -74,13 +71,9 @@ class KYCActivity : AppCompatActivity() {
         docName = intent.getStringExtra("DOC_NAME") ?: ""
         userName = intent.getStringExtra("USER_NAME") ?: ""
         userCountry = intent.getStringExtra("USER_COUNTRY") ?: ""
-        localMarkers = intent.getStringExtra("LOCAL_MARKERS")?.split(",") ?: listOf()
-        userIDNum = intent.getStringExtra("ID_NUMBER") ?: ""
-        userDOB = intent.getStringExtra("DOB") ?: ""
         
         SecurityEngine.reset()
         
-        // AI: Determine if paper or plastic based on doc name
         val paperKeywords = listOf("bill", "statement", "tax", "agreement", "payslip")
         SecurityEngine.setPaperMode(paperKeywords.any { docName.lowercase().contains(it) })
         
@@ -90,30 +83,26 @@ class KYCActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
-        binding.btnCapture.setOnClickListener { 
-            if (isSecurityPass) takePhoto() 
-            else Toast.makeText(this, "Wait for document to clear...", Toast.LENGTH_SHORT).show()
-        }
+        // Hide capture button - Experience is fully autonomous
+        binding.btnCapture.visibility = View.GONE
     }
 
     private fun setupUI() {
         binding.overlay.setMode(mode)
         when (mode) {
             "DOCUMENT" -> {
-                binding.textTitle.text = "Strict AI Verify: $docName"
-                binding.textTitle.setTextColor(Color.parseColor("#00d2ff"))
-                binding.textInstruction.text = "Scanning for physical document..."
+                binding.textTitle.text = "Autonomous AI Scan: $docName"
+                binding.textTitle.setTextColor(Color.parseColor("#00ff88"))
+                binding.textInstruction.text = "Hold document steady in frame"
                 binding.textChallenge.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
-                binding.btnCapture.alpha = 0.5f
             }
             "SELFIE" -> {
-                binding.textTitle.text = "Live Identity Proof"
+                binding.textTitle.text = "Live Identity Verification"
                 binding.textTitle.setTextColor(Color.parseColor("#f3ff00"))
-                binding.textInstruction.text = "Center face and follow prompts"
+                binding.textInstruction.text = "Follow the prompts clearly"
                 binding.textChallenge.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
-                binding.btnCapture.visibility = View.GONE
                 updateChallenge()
             }
         }
@@ -160,7 +149,7 @@ class KYCActivity : AppCompatActivity() {
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, analyzer)
             } catch (exc: Exception) {
                 Log.e("KYC", "Camera launch fail", exc)
-                runOnUiThread { Toast.makeText(this, "Camera Error. Please restart.", Toast.LENGTH_LONG).show() }
+                runOnUiThread { Toast.makeText(this, "Hardware Error. Please restart.", Toast.LENGTH_LONG).show() }
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -176,7 +165,7 @@ class KYCActivity : AppCompatActivity() {
         val mediaImage = imageProxy.image ?: return
         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
-        // 1. Security Check (Moire, Blur, Glare)
+        // 1. Security Physicality Check
         val security = SecurityEngine.analyzeFrame(imageProxy)
         
         runOnUiThread {
@@ -186,15 +175,35 @@ class KYCActivity : AppCompatActivity() {
             }
             binding.progressBar.progress = security.score
             
-            val overlayStatus = if (isSecurityPass) "GREEN" else if (security.score > 20) "YELLOW" else "RED"
-            binding.overlay.setStatus(overlayStatus)
+            val status = if (isSecurityPass) "GREEN" else if (security.score > 20) "YELLOW" else "RED"
+            binding.overlay.setStatus(status)
         }
 
         // 2. Intelligence Processing
         if (mode == "SELFIE") {
             processFace(image, imageProxy)
         } else {
-            processDocument(image, imageProxy, security)
+            // Document mode: Pure physicality and clarity check for auto-capture
+            if (security.isSharp && security.isPhysical && security.hasDetail) {
+                runOnUiThread {
+                    binding.textInstruction.text = "Document Verified. Auto-capturing..."
+                    binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
+                    isSecurityPass = true
+                    
+                    // Trigger capture after 0.35s of sustained pass
+                    if (autoCaptureStartTime == 0L) {
+                        autoCaptureStartTime = System.currentTimeMillis()
+                    } else if (System.currentTimeMillis() - autoCaptureStartTime > 350) {
+                        takePhoto()
+                    }
+                }
+            } else {
+                runOnUiThread {
+                    isSecurityPass = false
+                    autoCaptureStartTime = 0L
+                }
+            }
+            imageProxy.close()
         }
     }
 
@@ -213,71 +222,12 @@ class KYCActivity : AppCompatActivity() {
             .addOnCompleteListener { imageProxy.close() }
     }
 
-    private fun processDocument(image: InputImage, imageProxy: ImageProxy, security: SecurityEngine.SecurityResult) {
-        textRecognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                val text = visionText.text.lowercase()
-                
-                // Smart Name Matcher
-                val accountNameParts = userName.lowercase().split(" ").filter { it.length > 2 }
-                val nameMatch = if (accountNameParts.isEmpty()) true else accountNameParts.all { text.contains(it) }
-                
-                // Geography Matcher
-                val geographyMatch = text.contains(userCountry.lowercase()) || 
-                                     localMarkers.any { it.isNotEmpty() && text.contains(it.lowercase()) }
-
-                // National ID Specific: Extract ID Number and DOB
-                var idNumMatch = true
-                var dobMatch = true
-                if (docName.lowercase().contains("id")) {
-                    if (userIDNum.isNotEmpty()) idNumMatch = text.contains(userIDNum.lowercase())
-                    if (userDOB.isNotEmpty()) {
-                        val dobParts = userDOB.split("/").filter { it.isNotEmpty() }
-                        dobMatch = dobParts.all { text.contains(it.lowercase()) }
-                    }
-                }
-                
-                runOnUiThread {
-                    if (security.isSharp && security.isPhysical && security.hasDetail) {
-                        if (nameMatch && geographyMatch && idNumMatch && dobMatch) {
-                            binding.textInstruction.text = "Document Verified. Auto-capturing..."
-                            binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
-                            binding.btnCapture.alpha = 1.0f
-                            isSecurityPass = true
-                            
-                            // Extra-Snappy Auto-Capture: 0.4 seconds
-                            if (autoCaptureStartTime == 0L) {
-                                autoCaptureStartTime = System.currentTimeMillis()
-                            } else if (System.currentTimeMillis() - autoCaptureStartTime > 400) {
-                                takePhoto()
-                            }
-                        } else {
-                            binding.textInstruction.setTextColor(Color.parseColor("#ff00ff"))
-                            autoCaptureStartTime = 0L
-                            if (!nameMatch) binding.textInstruction.text = "Name mismatch. Use your own ID."
-                            else if (!geographyMatch) binding.textInstruction.text = "Region mismatch."
-                            else if (!idNumMatch) binding.textInstruction.text = "ID Number mismatch."
-                            else if (!dobMatch) binding.textInstruction.text = "DOB mismatch. Hold steady."
-                            
-                            isSecurityPass = false
-                            binding.btnCapture.alpha = 0.5f
-                        }
-                    } else {
-                        isSecurityPass = false
-                        autoCaptureStartTime = 0L
-                        binding.btnCapture.alpha = 0.5f
-                    }
-                }
-            }
-            .addOnCompleteListener { imageProxy.close() }
-    }
-
     private fun handleChallengeSuccess() {
         livenessScore += 5
         runOnUiThread {
             binding.progressBar.progress = livenessScore
             if (livenessScore % 20 == 0) {
-                performHaptic()
+                performHaptic(40)
                 updateChallenge()
             }
             if (livenessScore >= requiredLiveness) {
@@ -286,12 +236,12 @@ class KYCActivity : AppCompatActivity() {
         }
     }
 
-    private fun performHaptic() {
+    private fun performHaptic(duration: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE))
         } else {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(50)
+            vibrator.vibrate(duration)
         }
     }
 
@@ -311,15 +261,14 @@ class KYCActivity : AppCompatActivity() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    performHaptic()
+                    performHaptic(80) // Stronger vibrate for capture
                     if (mode == "DOCUMENT" && step == "FRONT") {
                         step = "BACK"
                         runOnUiThread {
-                            binding.textInstruction.text = "Front Verified. TURN CARD & Scan BACK."
+                            binding.textInstruction.text = "Front Verified. TURN CARD for BACK side."
                             binding.textInstruction.setTextColor(Color.WHITE)
                             isSecurityPass = false
                             isCapturing = false
-                            binding.btnCapture.alpha = 0.5f
                             autoCaptureStartTime = 0L
                             SecurityEngine.reset()
                         }

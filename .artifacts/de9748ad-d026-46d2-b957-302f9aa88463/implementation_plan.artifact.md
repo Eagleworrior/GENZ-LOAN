@@ -1,58 +1,55 @@
-# Extra-Professional AI KYC: Auto-Capture & Deep Cross-Validation
+# Zero-Friction AI KYC: Seamless Auto-Capture & Flexible Verification
 
-Implement a high-performance, enterprise-grade identity verification system. This update focuses on "Zero-Frustration" auto-capture and surgical data matching between physical documents and user account data.
+This plan optimizes the identity verification system by removing strict data matching that causes user frustration, moving to a fully autonomous auto-capture model, and relocating the device upload option for better visibility and functionality.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> **Dynamic Validation**: The app will now extract **ID Number** and **DOB** (Day/Month/Year) in real-time. Verification will **FAIL** and capture will be **LOCKED** if these do not exactly match the details provided during account creation.
+> [!WARNING]
+> **Security Simplification**: As requested, I am **removing** the strict real-time matching of Name, ID Number, and Date of Birth during the camera scan. The AI will now focus purely on verifying that a clear, physical document is present.
 
-> [!NOTE]
-> **Auto-Capture Calibration**: To prevent the "annoying" stability errors, I am implementing a "Stability Window" (0.5s). If the image is clear and data matches, it will capture instantly even with minor tremors.
+> [!IMPORTANT]
+> **Autonomous Capture**: The manual capture button will be removed. The app will automatically take the photo once the document is clear and stable, ensuring a hands-free, professional experience.
 
 ## Proposed Changes
 
-### 1. The "Extra-Professional" Security Engine (Kotlin)
-
-#### [MODIFY] [SecurityEngine.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/SecurityEngine.kt)
-- **Zero-Friction Sharpness**: Recalibrate variance thresholds to favor focus over absolute stillness.
-- **Material DNA Check**: Refine glare detection to work faster in indoor lighting.
-- **Entropy Shield**: Hard-block any capture that lacks document-like texture (preventing blank wall/paper captures).
+### 1. Zero-Friction AI Core (Android Native)
 
 #### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
-- **Hands-Free Auto-Capture**: Once the "Reality Check" and "Data Match" are green for 500ms, the photo is taken automatically.
-- **ID Data Extraction (OCR)**:
-    - Use ML Kit to find the 10+ digit ID number.
-    - Extract the DOB string and parse Day, Month, and Year.
-- **Smart Turn-Around**: Seamless transition from Front to Back capture with a professional haptic (vibration) signal.
+- **Remove Matching Logic**: Delete the code that checks for Name, ID, and DOB overlaps.
+- **Hide Capture Button**: Set `btnCapture` visibility to `GONE`.
+- **Haptic Turnaround**: Implement a clear "Front Captured - Turn Card" vibration and message.
+- **Reliable Auto-Capture**: Recalibrate the timer to capture the moment the security score is high enough.
+
+#### [MODIFY] [SecurityEngine.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/SecurityEngine.kt)
+- **Relax Stability Threshold**: Further loosen the "Phone Moving" check to allow for natural hand tremors.
+- **Focus on Physicality**: Keep the "Digital Screen" protection but make it less sensitive to movement.
 
 ---
 
-### 2. High-Integrity Cross-Validation
-
-#### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- **Metadata Bridge**: Pass the `idNumber` and `dob` (e.g., "15/08/1995") from the user's stored loan form to the native camera.
-- **Upload Resilience**: Allow the user to upload a file as an alternative, but still trigger a "Selfie Match" to prove they own the uploaded doc.
+### 2. High-Visibility UI (Web Layer)
 
 #### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
-- Ensure the **Home Button** is perfectly integrated into the transition screens for a premium feel.
+- **Move Upload Button**: Relocate the "Upload from Device" option from the selector screen to the **Guidance Screen**.
+- **Dual Options**: Display "Start Secure Capture" and "Upload Document" together on the same screen after a document type is selected.
+
+#### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
+- **Fix Upload Logic**: Ensure the file picker opens correctly and triggers the transition to the next step immediately.
+- **Update Guidance**: Add a clear instruction about the auto-capture feature so the user knows they don't need to press a button.
 
 ---
 
-### 3. Visual & Haptic Feedback
-- **Neon Pulse**: The capture frame will pulse in `--neon-blue` when scanning and lock into solid `--neon-green` with a checkmark when auto-capturing.
-- **Specific Error Guidance**: Instead of "Phone Moving," the app will show professional errors like:
-    - *"Focusing... Hold Steady"*
-    - *"ID Number Mismatch"*
-    - *"Waiting for Glare (Tilt Card)"*
+### 3. Visual Feedback
+- **Neon "Green-Go"**: The frame will turn green and pulse when the AI is about to auto-capture.
+- **Instruction Update**: "Hold steady... Capturing in 3, 2, 1" countdown text.
 
 ## Verification Plan
 
-### Automated Security Tests
-- **Wrong ID Test**: Point at an ID that is perfectly clear but has a different ID number. **Goal**: Capture must remain locked.
-- **Blank Test**: Point at a white paper. **Goal**: App must stay on "No document detected."
-- **Stability Test**: Perform a steady capture. **Goal**: Must trigger within 1 second of alignment.
-
 ### Manual Verification
-- Verify the "Upload from Device" flow skips to the liveness check.
-- Confirm Home button works on every screen.
+- **Auto-Capture Test**: Hold an ID card to the camera. Verify it captures automatically without pressing any button.
+- **Turnaround Test**: Verify the app prompts for the "BACK" side immediately after the front is taken.
+- **Upload Test**: Go to the guidance screen, click "Upload from Device," and verify it accepts the file and proceeds.
+- **Friction Test**: Verify that mismatched details no longer block the capture.
+
+### Quality Check
+- Confirm the Home button is present on the guidance screen.
+- Confirm the app is much faster and doesn't get stuck on "Phone moving."

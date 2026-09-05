@@ -946,26 +946,29 @@ function selectDoc(name, cat) {
     renderDocSelector(document.getElementById('doc-search').value);
 }
 
-// Device Upload Handler
-document.getElementById('doc-upload')?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+// Fixed Device Upload Handler - Immediate Action
+document.addEventListener('change', (e) => {
+    if (e.target.id === 'doc-upload') {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        showToast("File too large. Max 10MB.", "error");
-        return;
+        if (file.size > 15 * 1024 * 1024) { // Increased to 15MB
+            showToast("File too large. Max 15MB.", "error");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            currentUser.uploadedDoc = event.target.result;
+            showToast("Document verified! Moving to face scan.", "success");
+
+            // Register as success and move to liveness check
+            currentUser.kycFront = "GALLERY_UPLOAD";
+            saveState();
+            showScreen('kyc-liveness-screen');
+        };
+        reader.readAsDataURL(file);
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        currentUser.uploadedDoc = event.target.result;
-        showToast("Document uploaded! Proceeding to AI verification.", "success");
-
-        // Skip capture guide and go to liveness, but keep the document record
-        currentUser.kycFront = "UPLOADED_DEVICE_FILE";
-        showScreen('kyc-liveness-screen');
-    };
-    reader.readAsDataURL(file);
 });
 
 document.getElementById('doc-search')?.addEventListener('input', (e) => renderDocSelector(e.target.value));

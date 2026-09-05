@@ -528,17 +528,8 @@
                     <!-- Categories injected by JS -->
                 </div>
 
-                <div class="upload-option-divider">
-                    <span>OR</span>
-                </div>
-
-                <label class="btn secondary outline glow upload-btn" for="doc-upload">
-                    <i class="fa-solid fa-file-arrow-up"></i> Upload from Device
-                    <input type="file" id="doc-upload" hidden accept="image/*,.pdf">
-                </label>
-
                 <button id="btn-continue-kyc" class="btn primary glow" style="margin-top: 20px;" disabled>
-                    Start Capture <i class="fa-solid fa-arrow-right"></i>
+                    Proceed to Guide <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
         </div>
@@ -571,6 +562,15 @@
                 <button onclick="launchNativeKYC()" class="btn primary glow">
                     Start Secure Capture <i class="fa-solid fa-camera"></i>
                 </button>
+
+                <div class="upload-option-divider">
+                    <span>OR</span>
+                </div>
+
+                <label class="btn secondary outline glow upload-btn" for="doc-upload" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-file-arrow-up"></i> Upload from Device
+                    <input type="file" id="doc-upload" hidden accept="image/*,.pdf">
+                </label>
             </div>
         </div>
 

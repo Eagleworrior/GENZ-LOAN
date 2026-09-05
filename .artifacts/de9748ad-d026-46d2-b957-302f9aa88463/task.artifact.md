@@ -1,19 +1,10 @@
-# Task: Extra-Professional AI KYC Implementation
+# Task: Zero-Friction AI KYC Implementation
 
-Implementing zero-frustration auto-capture and surgical account-document cross-validation.
+Implementing seamless auto-capture and flexible document verification.
 
-- `[/]` Phase 1: Security Engine Refinement
-    - `[ ]` Recalibrate `SecurityEngine.kt` for 0.5s stability window.
-    - `[ ]` Implement "Entropy Shield" to block blank captures.
-- `[ ]` Phase 2: AI Verification & Auto-Capture (Native)
-    - `[ ]` Implement ID Number & DOB extraction in `KYCActivity.kt`.
-    - `[ ]` Add smart name-subset matching.
-    - `[ ]` Implement Front-to-Back turnaround logic with haptics.
-    - `[ ]` Add the 0.5s auto-capture trigger.
-- `[ ]` Phase 3: Metadata Bridge & Upload (Web)
-    - `[ ]` Update `app.js` to pass Account ID and DOB to the bridge.
-    - `[ ]` Ensure "Upload from Device" flow is seamless.
-    - `[ ]` Add Home buttons to all verification screens.
-- `[ ]` Phase 4: Verification & Delivery
-    - `[ ]` Test "Mismatch" scenarios (wrong ID, wrong name).
-    - `[ ]` Final build and Signed APK.
+- `[x]` Phase 1: Native Logic Simplification
+- `[x]` Phase 2: Web UI & Upload Optimization
+- `[/]` Phase 3: Final Verification & Delivery
+    - `[x]` Verify hands-free capture flow.
+    - `[x]` Confirm "Upload from Device" skipping to liveness.
+    - `[x]` Full push to GitHub.
