@@ -92,7 +92,7 @@ class KYCActivity : AppCompatActivity() {
 
         binding.btnCapture.setOnClickListener { 
             if (isSecurityPass) takePhoto() 
-            else Toast.makeText(this, "Wait for AI security clearance...", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(this, "Wait for document to clear...", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -186,7 +186,7 @@ class KYCActivity : AppCompatActivity() {
             }
             binding.progressBar.progress = security.score
             
-            val overlayStatus = if (isSecurityPass) "GREEN" else if (security.score > 35) "YELLOW" else "RED"
+            val overlayStatus = if (isSecurityPass) "GREEN" else if (security.score > 25) "YELLOW" else "RED"
             binding.overlay.setStatus(overlayStatus)
         }
 
@@ -222,7 +222,7 @@ class KYCActivity : AppCompatActivity() {
                 val accountNameParts = userName.lowercase().split(" ").filter { it.length > 2 }
                 val nameMatch = if (accountNameParts.isEmpty()) true else accountNameParts.all { text.contains(it) }
                 
-                // Geography Matcher
+                // Geography AI
                 val geographyMatch = text.contains(userCountry.lowercase()) || 
                                      localMarkers.any { it.isNotEmpty() && text.contains(it.lowercase()) }
 
@@ -240,24 +240,24 @@ class KYCActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (security.isSharp && security.isPhysical && security.hasDetail) {
                         if (nameMatch && geographyMatch && idNumMatch && dobMatch) {
-                            binding.textInstruction.text = "Highest Security Cleared. Auto-capturing..."
+                            binding.textInstruction.text = "Document Verified. Auto-capturing..."
                             binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
                             binding.btnCapture.alpha = 1.0f
                             isSecurityPass = true
                             
-                            // Auto-Capture logic: Trigger if pass for 1.2 seconds
+                            // Snappier Auto-Capture: 0.6 seconds
                             if (autoCaptureStartTime == 0L) {
                                 autoCaptureStartTime = System.currentTimeMillis()
-                            } else if (System.currentTimeMillis() - autoCaptureStartTime > 1200) {
+                            } else if (System.currentTimeMillis() - autoCaptureStartTime > 600) {
                                 takePhoto()
                             }
                         } else {
                             binding.textInstruction.setTextColor(Color.parseColor("#ff00ff"))
                             autoCaptureStartTime = 0L
                             if (!nameMatch) binding.textInstruction.text = "Name mismatch. Use your own ID."
-                            else if (!geographyMatch) binding.textInstruction.text = "Document country mismatch."
+                            else if (!geographyMatch) binding.textInstruction.text = "Region mismatch."
                             else if (!idNumMatch) binding.textInstruction.text = "ID Number mismatch."
-                            else if (!dobMatch) binding.textInstruction.text = "DOB mismatch. Ensure DOB is clear."
+                            else if (!dobMatch) binding.textInstruction.text = "DOB mismatch. Hold steady."
                             
                             isSecurityPass = false
                             binding.btnCapture.alpha = 0.5f
@@ -276,7 +276,7 @@ class KYCActivity : AppCompatActivity() {
         livenessScore += 5
         runOnUiThread {
             binding.progressBar.progress = livenessScore
-            if (livenessScore % 25 == 0) {
+            if (livenessScore % 20 == 0) {
                 performHaptic()
                 updateChallenge()
             }
@@ -306,19 +306,21 @@ class KYCActivity : AppCompatActivity() {
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), 
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e("KYC", "Secure Capture Error: ${exc.message}")
+                    Log.e("KYC", "Capture Error: ${exc.message}")
                     isCapturing = false
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    performHaptic()
                     if (mode == "DOCUMENT" && step == "FRONT") {
                         step = "BACK"
                         runOnUiThread {
-                            binding.textInstruction.text = "Front Side Verified. Capture BACK now."
+                            binding.textInstruction.text = "Front Verified. TURN CARD & Scan BACK."
                             binding.textInstruction.setTextColor(Color.WHITE)
                             isSecurityPass = false
                             isCapturing = false
                             binding.btnCapture.alpha = 0.5f
+                            autoCaptureStartTime = 0L
                             SecurityEngine.reset()
                         }
                         saveResult("FRONT_PATH", photoFile.absolutePath)

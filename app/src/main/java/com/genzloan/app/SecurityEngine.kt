@@ -8,7 +8,7 @@ import kotlin.math.abs
 
 /**
  * Enterprise-Grade Security Engine for local document and liveness validation.
- * Performs real-time checks for blur, motion, and digital screen artifacts.
+ * Implements physicality analysis to detect digital screens vs. real cards.
  */
 object SecurityEngine {
 
@@ -79,24 +79,24 @@ object SecurityEngine {
         val hasHotspot = (maxLocalLuma - mean) > 110 
         if (hasHotspot) glareDetectedCount++
         
-        // 3. Stability Check (Require 1 second of perfect stillness)
+        // 3. Stability Check (Lowered sensitivity to allow slight movement)
         val lumaDiff = if (lastLuminance < 0) 0.0 else abs(mean - lastLuminance)
         lastLuminance = mean
-        if (lumaDiff < 0.4) stabilityFrames++ else stabilityFrames = 0
+        if (lumaDiff < 1.0) stabilityFrames++ else stabilityFrames = 0
         
-        val isStable = stabilityFrames > 12 // Require ~1 second of zero motion
-        val isSharp = variance > 160 // High sharpness threshold
-        val hasDetail = contrastEdges > (count * 0.03) // Reject if less than 3% edges (blank surfaces)
+        val isStable = stabilityFrames > 6 // Require ~0.5 seconds of relative stillness
+        val isSharp = variance > 110 // Lowered threshold for better responsiveness
+        val hasDetail = contrastEdges > (count * 0.02) // Reject if less than 2% edges (blank surfaces)
         
         // Dynamic physicality requirement
-        val requiredGlare = if (isPaperMode) 3 else 10 
+        val requiredGlare = if (isPaperMode) 2 else 6 
         val isPhysical = glareDetectedCount >= requiredGlare && !isDigitalScreen
 
         val message = when {
             isDigitalScreen -> "Digital Spoof Detected. Use Physical Document."
             !hasDetail -> "No document detected. Avoid blank surfaces."
-            !isSharp -> "Too blurry. Improve lighting."
-            !isStable -> "Phone moving. Hold steady."
+            !isSharp -> "Improving clarity... Hold steady."
+            !isStable -> "Aligning document... Hold steady."
             !isPhysical -> if (isPaperMode) "Scan paper document clearly." else "Security: Tilt card to verify material."
             else -> "Physical Document Verified. Ready."
         }
@@ -107,7 +107,7 @@ object SecurityEngine {
             isPhysical = isPhysical,
             hasDetail = hasDetail,
             message = message,
-            score = if (isDigitalScreen || !hasDetail) 0 else ((variance / 4) + (stabilityFrames * 3)).toInt().coerceIn(0, 100)
+            score = if (isDigitalScreen || !hasDetail) 0 else ((variance / 4) + (stabilityFrames * 4)).toInt().coerceIn(0, 100)
         )
     }
 
