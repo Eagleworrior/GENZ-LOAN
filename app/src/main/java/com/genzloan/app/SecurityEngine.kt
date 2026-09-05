@@ -42,7 +42,7 @@ object SecurityEngine {
         
         var sum = 0L
         var sumSq = 0L
-        val step = 8 // Faster processing
+        val step = 8 
         var count = 0
         
         var maxLocalLuma = 0
@@ -69,35 +69,35 @@ object SecurityEngine {
         val mean = sum.toDouble() / count
         val variance = (sumSq.toDouble() / count) - (mean * mean)
         
-        // 1. Sharpness (Lowered threshold for better responsiveness on clear images)
-        val isSharp = variance > 90 
+        // 1. Texture & Entropy Check (Strictly block blank/empty captures)
+        val hasDetail = contrastEdges > (count * 0.04) // Require 4% edge density to detect a document
         
-        // 2. Physicality Checks
-        val isDigitalScreen = contrastEdges > (count * 0.18) && variance > 450
+        // 2. Sharpness (High standard for readability)
+        val isSharp = variance > 125 
         
-        // Specular Glare (Light reflections)
-        val hasHotspot = (maxLocalLuma - mean) > 85 
+        // 3. Physicality & Spoof Detection
+        val isDigitalScreen = contrastEdges > (count * 0.18) && variance > 480
+        
+        // Specular Glare (Physical light reflections)
+        val hasHotspot = (maxLocalLuma - mean) > 100 
         if (hasHotspot) glareDetectedCount++
         
-        // 3. Stability Check (High tolerance to avoid "Phone Moving" frustration)
+        // 4. Fast Stability Check
         val lumaDiff = if (lastLuminance < 0) 0.0 else abs(mean - lastLuminance)
         lastLuminance = mean
+        if (lumaDiff < 1.8) stabilityFrames++ else stabilityFrames = 0
         
-        // Very lenient stability: allow significant change to accommodate hand tremors
-        if (lumaDiff < 2.5) stabilityFrames++ else stabilityFrames = 0
+        val isStable = stabilityFrames > 5 // Require ~0.35 seconds of stillness
         
-        val isStable = stabilityFrames > 3 // Require only ~0.2 seconds of relative stillness
-        val hasDetail = contrastEdges > (count * 0.015) // Reject if less than 1.5% edges (blank walls)
-        
-        // Physicality Proof requirement (Lowered for speed)
-        val requiredGlare = if (isPaperMode) 1 else 3
-        val isPhysical = (glareDetectedCount >= requiredGlare) && !isDigitalScreen
+        // Physicality Proof requirement
+        val requiredGlare = if (isPaperMode) 1 else 5
+        val isPhysical = (glareDetectedCount >= requiredGlare) && !isDigitalScreen && hasDetail
 
         val message = when {
             isDigitalScreen -> "Digital Spoof Detected. Use Physical Document."
-            !hasDetail -> "No document detected. Avoid blank surfaces."
-            !isSharp -> "Focusing... Hold steady."
-            !isStable -> "Aligning... Hold steady."
+            !hasDetail -> "Align document in the frame."
+            !isSharp -> "Improving focus... Hold steady."
+            !isStable -> "Stabilizing... Hold steady."
             !isPhysical -> if (isPaperMode) "Align document clearly." else "Security: Tilt document slowly."
             else -> "Document Verified. Ready."
         }
@@ -108,7 +108,7 @@ object SecurityEngine {
             isPhysical = isPhysical,
             hasDetail = hasDetail,
             message = message,
-            score = if (isDigitalScreen || !hasDetail) 0 else ((variance / 4) + (stabilityFrames * 10)).toInt().coerceIn(0, 100)
+            score = if (isDigitalScreen || !hasDetail) 0 else ((variance / 4) + (stabilityFrames * 8)).toInt().coerceIn(0, 100)
         )
     }
 

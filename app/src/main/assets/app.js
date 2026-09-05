@@ -946,13 +946,13 @@ function selectDoc(name, cat) {
     renderDocSelector(document.getElementById('doc-search').value);
 }
 
-// Fixed Device Upload Handler - Immediate Action
+// Fixed Device Upload Handler - Immediate Action & Global Scope
 document.addEventListener('change', (e) => {
     if (e.target.id === 'doc-upload') {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (file.size > 15 * 1024 * 1024) { // Increased to 15MB
+        if (file.size > 15 * 1024 * 1024) {
             showToast("File too large. Max 15MB.", "error");
             return;
         }
@@ -960,10 +960,10 @@ document.addEventListener('change', (e) => {
         const reader = new FileReader();
         reader.onload = (event) => {
             currentUser.uploadedDoc = event.target.result;
-            showToast("Document verified! Moving to face scan.", "success");
+            showToast("Document received! Moving to identity proof.", "success");
 
-            // Register as success and move to liveness check
-            currentUser.kycFront = "GALLERY_UPLOAD";
+            // Bypass camera and go to liveness
+            currentUser.kycFront = "DEVICE_UPLOAD";
             saveState();
             showScreen('kyc-liveness-screen');
         };

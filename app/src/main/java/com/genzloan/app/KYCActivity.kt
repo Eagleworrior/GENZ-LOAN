@@ -20,8 +20,6 @@ import com.genzloan.app.databinding.ActivityKycBinding
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,10 +50,6 @@ class KYCActivity : AppCompatActivity() {
         FaceDetection.getClient(options)
     }
 
-    private val textRecognizer by lazy {
-        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    }
-
     private val vibrator by lazy { getSystemService(Context.VIBRATOR_SERVICE) as Vibrator }
 
     private var isSecurityPass = false
@@ -83,7 +77,7 @@ class KYCActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
-        // Hide capture button - Experience is fully autonomous
+        // Hide capture button - User experience is 100% autonomous
         binding.btnCapture.visibility = View.GONE
     }
 
@@ -91,16 +85,16 @@ class KYCActivity : AppCompatActivity() {
         binding.overlay.setMode(mode)
         when (mode) {
             "DOCUMENT" -> {
-                binding.textTitle.text = "Autonomous AI Scan: $docName"
+                binding.textTitle.text = "Autonomous AI Verify"
                 binding.textTitle.setTextColor(Color.parseColor("#00ff88"))
                 binding.textInstruction.text = "Hold document steady in frame"
                 binding.textChallenge.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
             }
             "SELFIE" -> {
-                binding.textTitle.text = "Live Identity Verification"
+                binding.textTitle.text = "Live Identity Lock"
                 binding.textTitle.setTextColor(Color.parseColor("#f3ff00"))
-                binding.textInstruction.text = "Follow the prompts clearly"
+                binding.textInstruction.text = "Follow prompts to verify"
                 binding.textChallenge.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 updateChallenge()
@@ -163,9 +157,9 @@ class KYCActivity : AppCompatActivity() {
         }
 
         val mediaImage = imageProxy.image ?: return
-        val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+        val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
-        // 1. Security Physicality Check
+        // 1. Physicality Check
         val security = SecurityEngine.analyzeFrame(imageProxy)
         
         runOnUiThread {
@@ -175,22 +169,22 @@ class KYCActivity : AppCompatActivity() {
             }
             binding.progressBar.progress = security.score
             
-            val status = if (isSecurityPass) "GREEN" else if (security.score > 20) "YELLOW" else "RED"
+            val status = if (isSecurityPass) "GREEN" else if (security.score > 25) "YELLOW" else "RED"
             binding.overlay.setStatus(status)
         }
 
         // 2. Intelligence Processing
         if (mode == "SELFIE") {
-            processFace(image, imageProxy)
+            processFace(inputImage, imageProxy)
         } else {
-            // Document mode: Pure physicality and clarity check for auto-capture
+            // Document Mode: NO barriers. Capture when clear & physical.
             if (security.isSharp && security.isPhysical && security.hasDetail) {
                 runOnUiThread {
-                    binding.textInstruction.text = "Document Verified. Auto-capturing..."
+                    binding.textInstruction.text = "Verified. Auto-capturing..."
                     binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
                     isSecurityPass = true
                     
-                    // Trigger capture after 0.35s of sustained pass
+                    // High-speed auto-capture trigger (0.35s)
                     if (autoCaptureStartTime == 0L) {
                         autoCaptureStartTime = System.currentTimeMillis()
                     } else if (System.currentTimeMillis() - autoCaptureStartTime > 350) {
@@ -261,11 +255,11 @@ class KYCActivity : AppCompatActivity() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    performHaptic(80) // Stronger vibrate for capture
+                    performHaptic(80) 
                     if (mode == "DOCUMENT" && step == "FRONT") {
                         step = "BACK"
                         runOnUiThread {
-                            binding.textInstruction.text = "Front Verified. TURN CARD for BACK side."
+                            binding.textInstruction.text = "Front Saved. TURN CARD for BACK side."
                             binding.textInstruction.setTextColor(Color.WHITE)
                             isSecurityPass = false
                             isCapturing = false
@@ -298,6 +292,5 @@ class KYCActivity : AppCompatActivity() {
         super.onDestroy()
         cameraExecutor.shutdown()
         faceDetector.close()
-        textRecognizer.close()
     }
 }
