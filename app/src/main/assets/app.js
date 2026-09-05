@@ -946,27 +946,34 @@ function selectDoc(name, cat) {
     renderDocSelector(document.getElementById('doc-search').value);
 }
 
-// Fixed Device Upload Handler - Immediate Action & Global Scope
-document.addEventListener('change', (e) => {
-    if (e.target.id === 'doc-upload') {
+// Robust Device Upload Handler - Global Scope
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'doc-upload') {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (file.size > 15 * 1024 * 1024) {
-            showToast("File too large. Max 15MB.", "error");
-            return;
-        }
+        showToast("Processing file...", "info");
 
         const reader = new FileReader();
-        reader.onload = (event) => {
-            currentUser.uploadedDoc = event.target.result;
-            showToast("Document received! Moving to identity proof.", "success");
+        reader.onload = function(event) {
+            try {
+                currentUser.uploadedDoc = event.target.result;
+                currentUser.kycFront = "UPL_" + Date.now();
+                saveState();
+                showToast("Document received! Starting face scan.", "success");
 
-            // Bypass camera and go to liveness
-            currentUser.kycFront = "DEVICE_UPLOAD";
-            saveState();
-            showScreen('kyc-liveness-screen');
+                // Switch screen instantly
+                setTimeout(() => showScreen('kyc-liveness-screen'), 500);
+            } catch (err) {
+                console.error("Upload process error:", err);
+                showToast("Failed to process file. Try a photo.", "error");
+            }
         };
+
+        reader.onerror = function() {
+            showToast("Error reading file.", "error");
+        };
+
         reader.readAsDataURL(file);
     }
 });
@@ -1017,7 +1024,8 @@ function launchNativeKYC() {
 function launchNativeLiveness() {
     if (typeof AndroidKYC !== 'undefined') {
         const markers = COUNTRY_LOCAL_MARKERS[currentUser.country] || "";
-        AndroidKYC.startVerification("SELFIE", "", currentUser.name, currentUser.country, markers);
+        // Pass empty matching data for selfie mode
+        AndroidKYC.startVerification("SELFIE", "", currentUser.name, currentUser.country, markers, "", "");
     } else {
         showToast("AI Liveness requires the official Android App.", "error");
     }

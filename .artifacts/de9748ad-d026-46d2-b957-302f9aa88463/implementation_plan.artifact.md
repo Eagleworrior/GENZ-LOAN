@@ -1,55 +1,51 @@
-# Zero-Friction AI KYC: Seamless Auto-Capture & Flexible Verification
+# Document DNA AI: Intelligent Physicality & Feature Detection
 
-This plan optimizes the identity verification system by removing strict data matching that causes user frustration, moving to a fully autonomous auto-capture model, and relocating the device upload option for better visibility and functionality.
+Restore the advanced AI features that verify the authenticity of the physical card and its structural features, while removing the strict "Account Matching" barriers that cause user frustration.
 
 ## User Review Required
 
-> [!WARNING]
-> **Security Simplification**: As requested, I am **removing** the strict real-time matching of Name, ID Number, and Date of Birth during the camera scan. The AI will now focus purely on verifying that a clear, physical document is present.
-
 > [!IMPORTANT]
-> **Autonomous Capture**: The manual capture button will be removed. The app will automatically take the photo once the document is clear and stable, ensuring a hands-free, professional experience.
+> **Document Layout AI**: The system will now look for "Document DNA"—specifically, it will scan for a photo (face) and text density on the card. If you point it at a blank wall or a piece of furniture, it will **NOT** capture, even if the light is green.
+
+> [!TIP]
+> **Flexible Validation**: I am removing the hard block on Name/ID/DOB matching. If the details match, it's a bonus, but if the AI can't perfectly read them, it will **STILL** allow the capture as long as the document is real and clear.
 
 ## Proposed Changes
 
-### 1. Zero-Friction AI Core (Android Native)
+### 1. Document DNA AI (Android Native)
 
 #### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
-- **Remove Matching Logic**: Delete the code that checks for Name, ID, and DOB overlaps.
-- **Hide Capture Button**: Set `btnCapture` visibility to `GONE`.
-- **Haptic Turnaround**: Implement a clear "Front Captured - Turn Card" vibration and message.
-- **Reliable Auto-Capture**: Recalibrate the timer to capture the moment the security score is high enough.
+- **Face-on-Card Detection**: In "National ID" mode, use the face detector on the document. A real ID must contain a small photo (a face).
+- **Text Block Density**: Verify that the document contains at least 3 distinct blocks of text (Name, Number, Date, etc.) to ensure it's not just a blank paper.
+- **Removed Account Barrier**: Account details (`userName`, `userIDNum`) will be checked, but failure to match will **NOT** block the capture. It will only show a "Scanning..." status.
 
 #### [MODIFY] [SecurityEngine.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/SecurityEngine.kt)
-- **Relax Stability Threshold**: Further loosen the "Phone Moving" check to allow for natural hand tremors.
-- **Focus on Physicality**: Keep the "Digital Screen" protection but make it less sensitive to movement.
+- **Hardened Entropy Shield**: Increase the required edge density to 5%. This ensures that even a clear white wall is rejected.
+- **Physicality DNA**: Require a shifting glare pattern to prove the document is plastic/paper and not a static image.
 
 ---
 
-### 2. High-Visibility UI (Web Layer)
+### 2. High-Speed Auto-Capture (0.3s)
 
-#### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
-- **Move Upload Button**: Relocate the "Upload from Device" option from the selector screen to the **Guidance Screen**.
-- **Dual Options**: Display "Start Secure Capture" and "Upload Document" together on the same screen after a document type is selected.
+#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
+- **Instant Trigger**: Reduce the sustained pass window to 300ms. As soon as the "Document DNA" is confirmed, the photo is taken.
+- **Haptic Signal**: A short pulse when DNA is detected, and a long pulse when captured.
+
+---
+
+### 3. UI & Upload Fixes
 
 #### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- **Fix Upload Logic**: Ensure the file picker opens correctly and triggers the transition to the next step immediately.
-- **Update Guidance**: Add a clear instruction about the auto-capture feature so the user knows they don't need to press a button.
-
----
-
-### 3. Visual Feedback
-- **Neon "Green-Go"**: The frame will turn green and pulse when the AI is about to auto-capture.
-- **Instruction Update**: "Hold steady... Capturing in 3, 2, 1" countdown text.
+- **Upload Resilience**: Ensure the upload handler uses a more robust file reader to handle high-res photos from modern device galleries.
 
 ## Verification Plan
 
-### Manual Verification
-- **Auto-Capture Test**: Hold an ID card to the camera. Verify it captures automatically without pressing any button.
-- **Turnaround Test**: Verify the app prompts for the "BACK" side immediately after the front is taken.
-- **Upload Test**: Go to the guidance screen, click "Upload from Device," and verify it accepts the file and proceeds.
-- **Friction Test**: Verify that mismatched details no longer block the capture.
+### The "Reality" Test
+1.  **Blank Wall Test**: Point camera at a wall. **Goal**: Must NOT capture.
+2.  **Blank Paper Test**: Point at a plain white A4 paper. **Goal**: Must NOT capture (missing text/DNA).
+3.  **Real ID Test**: Point at a real card. **Goal**: Must capture in < 0.5s.
+4.  **Mismatch Test**: Use a real ID with a different name. **Goal**: Must capture successfully (since barriers are removed).
 
 ### Quality Check
-- Confirm the Home button is present on the guidance screen.
-- Confirm the app is much faster and doesn't get stuck on "Phone moving."
+- Confirm "Turn Card" prompt appears for ID types.
+- Confirm Home button is present on all screens.

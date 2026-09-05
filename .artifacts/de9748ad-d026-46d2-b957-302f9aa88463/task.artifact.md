@@ -1,10 +1,19 @@
-# Task: Zero-Friction AI KYC Implementation
+# Task: Advanced Document DNA AI Implementation
 
-Implementing seamless auto-capture and flexible document verification.
+Restoring intelligent feature detection (Face, Text Density) while keeping user-friendly validation.
 
-- `[x]` Phase 1: Native Logic Simplification
-- `[x]` Phase 2: Web UI & Upload Optimization
-- `[/]` Phase 3: Final Verification & Delivery
-    - `[x]` Verify hands-free capture flow.
-    - `[x]` Confirm "Upload from Device" skipping to liveness.
-    - `[x]` Full push to GitHub.
+- `[/]` Phase 1: Security Engine Hardening
+    - `[x]` Increase entropy threshold to 5% in `SecurityEngine.kt`.
+    - `[x]` Refine glare requirement for physicality proof.
+- `[/]` Phase 2: Native AI Feature Restoration
+    - `[ ]` Implement Face-on-Card detection in `KYCActivity.kt`.
+    - `[ ]` Implement Text-Block density verification.
+    - `[ ]` Remove hard-block on Name/ID/DOB matching.
+    - `[ ]` Add 0.3s snappy auto-capture trigger.
+- `[ ]` Phase 3: Web UI & Upload Polish
+    - `[ ]` Ensure "Upload from Device" handler is robust and functional.
+    - `[ ]` Add visual feedback for "DNA Detection" states.
+- `[ ]` Phase 4: Verification & Delivery
+    - `[ ]` Test "Blank Wall" vs "Real ID" blocking.
+    - `[ ]` Verify "Name Mismatch" still allows capture.
+    - `[ ]` Final Signed APK.

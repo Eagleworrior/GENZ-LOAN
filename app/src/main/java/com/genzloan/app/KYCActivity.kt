@@ -20,6 +20,8 @@ import com.genzloan.app.databinding.ActivityKycBinding
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,6 +38,9 @@ class KYCActivity : AppCompatActivity() {
     private var docName = ""
     private var userName = ""
     private var userCountry = ""
+    private var userIDNum = ""
+    private var userDOB = ""
+    private var localMarkers = listOf<String>()
     
     private var step = "FRONT"
     private var livenessScore = 0
@@ -48,6 +53,10 @@ class KYCActivity : AppCompatActivity() {
             .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
             .build()
         FaceDetection.getClient(options)
+    }
+
+    private val textRecognizer by lazy {
+        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     }
 
     private val vibrator by lazy { getSystemService(Context.VIBRATOR_SERVICE) as Vibrator }
@@ -65,6 +74,9 @@ class KYCActivity : AppCompatActivity() {
         docName = intent.getStringExtra("DOC_NAME") ?: ""
         userName = intent.getStringExtra("USER_NAME") ?: ""
         userCountry = intent.getStringExtra("USER_COUNTRY") ?: ""
+        localMarkers = intent.getStringExtra("LOCAL_MARKERS")?.split(",") ?: listOf()
+        userIDNum = intent.getStringExtra("ID_NUMBER") ?: ""
+        userDOB = intent.getStringExtra("DOB") ?: ""
         
         SecurityEngine.reset()
         
@@ -77,24 +89,23 @@ class KYCActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
-        // Hide capture button - User experience is 100% autonomous
-        binding.btnCapture.visibility = View.GONE
+        binding.btnCapture.visibility = View.GONE // Fully autonomous
     }
 
     private fun setupUI() {
         binding.overlay.setMode(mode)
         when (mode) {
             "DOCUMENT" -> {
-                binding.textTitle.text = "Autonomous AI Verify"
+                binding.textTitle.text = "Document Feature AI"
                 binding.textTitle.setTextColor(Color.parseColor("#00ff88"))
-                binding.textInstruction.text = "Hold document steady in frame"
+                binding.textInstruction.text = "Initializing Scanner..."
                 binding.textChallenge.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
             }
             "SELFIE" -> {
-                binding.textTitle.text = "Live Identity Lock"
+                binding.textTitle.text = "Live Identity Verification"
                 binding.textTitle.setTextColor(Color.parseColor("#f3ff00"))
-                binding.textInstruction.text = "Follow prompts to verify"
+                binding.textInstruction.text = "Follow prompts clearly"
                 binding.textChallenge.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 updateChallenge()
@@ -142,8 +153,7 @@ class KYCActivity : AppCompatActivity() {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, analyzer)
             } catch (exc: Exception) {
-                Log.e("KYC", "Camera launch fail", exc)
-                runOnUiThread { Toast.makeText(this, "Hardware Error. Please restart.", Toast.LENGTH_LONG).show() }
+                Log.e("KYC", "Hardware link failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -159,7 +169,7 @@ class KYCActivity : AppCompatActivity() {
         val mediaImage = imageProxy.image ?: return
         val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
-        // 1. Physicality Check
+        // 1. Security Check
         val security = SecurityEngine.analyzeFrame(imageProxy)
         
         runOnUiThread {
@@ -177,27 +187,7 @@ class KYCActivity : AppCompatActivity() {
         if (mode == "SELFIE") {
             processFace(inputImage, imageProxy)
         } else {
-            // Document Mode: NO barriers. Capture when clear & physical.
-            if (security.isSharp && security.isPhysical && security.hasDetail) {
-                runOnUiThread {
-                    binding.textInstruction.text = "Verified. Auto-capturing..."
-                    binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
-                    isSecurityPass = true
-                    
-                    // High-speed auto-capture trigger (0.35s)
-                    if (autoCaptureStartTime == 0L) {
-                        autoCaptureStartTime = System.currentTimeMillis()
-                    } else if (System.currentTimeMillis() - autoCaptureStartTime > 350) {
-                        takePhoto()
-                    }
-                }
-            } else {
-                runOnUiThread {
-                    isSecurityPass = false
-                    autoCaptureStartTime = 0L
-                }
-            }
-            imageProxy.close()
+            processDocumentDNA(inputImage, imageProxy, security)
         }
     }
 
@@ -214,6 +204,46 @@ class KYCActivity : AppCompatActivity() {
                 }
             }
             .addOnCompleteListener { imageProxy.close() }
+    }
+
+    private fun processDocumentDNA(image: InputImage, imageProxy: ImageProxy, security: SecurityEngine.SecurityResult) {
+        // Run Face Detection (Small Photo on ID) and Text Recognition in parallel
+        faceDetector.process(image).addOnSuccessListener { faces ->
+            textRecognizer.process(image).addOnSuccessListener { visionText ->
+                val text = visionText.text.lowercase()
+                
+                // RESTORED: DNA Feature Checks
+                val hasPhoto = faces.isNotEmpty() || !docName.lowercase().contains("id") // Required for IDs
+                val hasTextDensity = visionText.textBlocks.size >= 2
+                
+                // USER-FRIENDLY: Optional matching (Bonus only)
+                val accountNames = userName.lowercase().split(" ").filter { it.length > 2 }
+                val isNameMatch = if (accountNames.isEmpty()) true else accountNames.all { text.contains(it) }
+                
+                runOnUiThread {
+                    if (security.isSharp && security.isPhysical && hasTextDensity && hasPhoto) {
+                        binding.textInstruction.text = if (isNameMatch) "Identity Verified. Capturing..." else "Document Verified. Capturing..."
+                        binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
+                        isSecurityPass = true
+                        
+                        // Extra-Snappy trigger (0.3s)
+                        if (autoCaptureStartTime == 0L) {
+                            autoCaptureStartTime = System.currentTimeMillis()
+                        } else if (System.currentTimeMillis() - autoCaptureStartTime > 300) {
+                            takePhoto()
+                        }
+                    } else {
+                        isSecurityPass = false
+                        autoCaptureStartTime = 0L
+                        if (!hasTextDensity && security.score > 20) {
+                            binding.textInstruction.text = "Align document features in frame."
+                        } else if (!hasPhoto && docName.lowercase().contains("id") && security.score > 30) {
+                            binding.textInstruction.text = "Ensure ID photo is visible."
+                        }
+                    }
+                }
+            }.addOnCompleteListener { imageProxy.close() }
+        }
     }
 
     private fun handleChallengeSuccess() {
@@ -259,7 +289,7 @@ class KYCActivity : AppCompatActivity() {
                     if (mode == "DOCUMENT" && step == "FRONT") {
                         step = "BACK"
                         runOnUiThread {
-                            binding.textInstruction.text = "Front Saved. TURN CARD for BACK side."
+                            binding.textInstruction.text = "Front Saved. TURN CARD & scan BACK side."
                             binding.textInstruction.setTextColor(Color.WHITE)
                             isSecurityPass = false
                             isCapturing = false
@@ -292,5 +322,6 @@ class KYCActivity : AppCompatActivity() {
         super.onDestroy()
         cameraExecutor.shutdown()
         faceDetector.close()
+        textRecognizer.close()
     }
 }

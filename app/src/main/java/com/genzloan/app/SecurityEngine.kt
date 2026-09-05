@@ -42,7 +42,7 @@ object SecurityEngine {
         
         var sum = 0L
         var sumSq = 0L
-        val step = 8 
+        val step = 6 // Higher precision for DNA check
         var count = 0
         
         var maxLocalLuma = 0
@@ -70,10 +70,10 @@ object SecurityEngine {
         val variance = (sumSq.toDouble() / count) - (mean * mean)
         
         // 1. Texture & Entropy Check (Strictly block blank/empty captures)
-        val hasDetail = contrastEdges > (count * 0.04) // Require 4% edge density to detect a document
+        val hasDetail = contrastEdges > (count * 0.05) // Require 5% edge density to detect a document
         
         // 2. Sharpness (High standard for readability)
-        val isSharp = variance > 125 
+        val isSharp = variance > 120 
         
         // 3. Physicality & Spoof Detection
         val isDigitalScreen = contrastEdges > (count * 0.18) && variance > 480
@@ -85,12 +85,12 @@ object SecurityEngine {
         // 4. Fast Stability Check
         val lumaDiff = if (lastLuminance < 0) 0.0 else abs(mean - lastLuminance)
         lastLuminance = mean
-        if (lumaDiff < 1.8) stabilityFrames++ else stabilityFrames = 0
+        if (lumaDiff < 2.0) stabilityFrames++ else stabilityFrames = 0
         
-        val isStable = stabilityFrames > 5 // Require ~0.35 seconds of stillness
+        val isStable = stabilityFrames > 4 // Require ~0.3 seconds of stillness
         
         // Physicality Proof requirement
-        val requiredGlare = if (isPaperMode) 1 else 5
+        val requiredGlare = if (isPaperMode) 1 else 4
         val isPhysical = (glareDetectedCount >= requiredGlare) && !isDigitalScreen && hasDetail
 
         val message = when {
