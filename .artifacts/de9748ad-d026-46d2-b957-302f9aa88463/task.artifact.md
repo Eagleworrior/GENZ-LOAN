@@ -1,11 +1,18 @@
-# Task: Critical KYC Fixes (Upload & Liveness)
+# Task: KYC Persistence & Liveness Stability Overhaul
 
-Fixing the non-responsive upload button and unreliable video selfie completion.
+Ensuring progress is saved, UI text is accurate, and liveness detection is unhackable.
 
-- `[x]` Phase 1: Native System Integration
-- `[x]` Phase 2: AI & Analyzer Hardening
-- `[/]` Phase 3: Final Verification & Push
-    - `[x]` Verify gallery opens on "Upload" click.
-    - `[x]` Verify selfie challenge completes smoothly.
-    - `[x]` Confirm "Blank Wall" rejection is 100% reliable.
-    - `[x]` Full push to GitHub.
+- `[/]` Phase 1: Persistence Logic Hardening
+    - `[ ]` Update `app.js` to save KYC flags in `localStorage`.
+    - `[ ]` Update `processLoanApplication` for smart step skipping.
+- `[ ]` Phase 2: Liveness Hardening (Native)
+    - `[ ]` Remove "document" text from `SELFIE` mode in `KYCActivity.kt`.
+    - `[ ]` Implement 3D "Head Turn" requirement for anti-simulation.
+    - `[ ]` Ensure auto-capture trigger on liveness finish.
+- `[ ]` Phase 3: Final Bridge & Upload Polish
+    - `[ ]` Verify `onShowFileChooser` in `MainActivity.kt`.
+    - `[ ]` Update `index.html` guidance text.
+- `[ ]` Phase 4: Final Verification
+    - `[ ]` Test Persistence (Close/Reopen).
+    - `[ ]` Test Anti-Spoof (Photo test).
+    - `[ ]` Final push.

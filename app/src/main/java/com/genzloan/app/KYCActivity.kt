@@ -79,6 +79,7 @@ class KYCActivity : AppCompatActivity() {
         userDOB = intent.getStringExtra("DOB") ?: ""
         
         SecurityEngine.reset()
+        SecurityEngine.setSelfieMode(mode == "SELFIE")
         
         val paperKeywords = listOf("bill", "statement", "tax", "agreement", "payslip")
         SecurityEngine.setPaperMode(paperKeywords.any { docName.lowercase().contains(it) })
@@ -96,16 +97,16 @@ class KYCActivity : AppCompatActivity() {
         binding.overlay.setMode(mode)
         when (mode) {
             "DOCUMENT" -> {
-                binding.textTitle.text = "Restoring Feature Guard..."
+                binding.textTitle.text = "Document AI Scan"
                 binding.textTitle.setTextColor(Color.parseColor("#00ff88"))
-                binding.textInstruction.text = "Initializing Scanner..."
+                binding.textInstruction.text = "Hold document steady in frame"
                 binding.textChallenge.visibility = View.GONE
                 binding.progressBar.visibility = View.VISIBLE
             }
             "SELFIE" -> {
-                binding.textTitle.text = "Identity Liveness Proof"
+                binding.textTitle.text = "Identity Liveness Lock"
                 binding.textTitle.setTextColor(Color.parseColor("#f3ff00"))
-                binding.textInstruction.text = "Follow prompts carefully"
+                binding.textInstruction.text = "Prove you are a real person"
                 binding.textChallenge.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.VISIBLE
                 updateChallenge()
@@ -114,12 +115,14 @@ class KYCActivity : AppCompatActivity() {
     }
 
     private fun updateChallenge() {
-        val challenges = listOf("BLINK", "SMILE", "NOD")
+        val challenges = listOf("BLINK", "SMILE", "TURN_LEFT", "TURN_RIGHT", "NOD_HEAD")
         currentChallenge = challenges.random()
         binding.textChallenge.text = when (currentChallenge) {
             "BLINK" -> "Action: BLINK BOTH EYES"
-            "SMILE" -> "Action: SMILE BIG"
-            "NOD" -> "Action: NOD HEAD SLIGHTLY"
+            "SMILE" -> "Action: GIVE A BIG SMILE"
+            "TURN_LEFT" -> "Action: TURN HEAD LEFT"
+            "TURN_RIGHT" -> "Action: TURN HEAD RIGHT"
+            "NOD_HEAD" -> "Action: NOD YOUR HEAD"
             else -> ""
         }
     }
@@ -153,7 +156,7 @@ class KYCActivity : AppCompatActivity() {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture, analyzer)
             } catch (exc: Exception) {
-                Log.e("KYC", "Lifecycle link fail", exc)
+                Log.e("KYC", "Hardware Error", exc)
             }
 
         }, ContextCompat.getMainExecutor(this))
@@ -180,7 +183,7 @@ class KYCActivity : AppCompatActivity() {
             if (!isSecurityPass) {
                 binding.textInstruction.text = security.message
             }
-            binding.progressBar.progress = security.score
+            binding.progressBar.progress = if (mode == "SELFIE") livenessScore else security.score
             val status = if (isSecurityPass) "GREEN" else if (security.score > 25) "YELLOW" else "RED"
             binding.overlay.setStatus(status)
         }
@@ -199,19 +202,19 @@ class KYCActivity : AppCompatActivity() {
                 if (faces.isNotEmpty()) {
                     val face = faces[0]
                     when (currentChallenge) {
-                        // Relaxed thresholds for better user experience
-                        "BLINK" -> if ((face.leftEyeOpenProbability ?: 1.0f) < 0.30f) handleChallengeSuccess()
-                        "SMILE" -> if ((face.smilingProbability ?: 0.0f) > 0.65f) handleChallengeSuccess()
-                        "NOD" -> if (Math.abs(face.headEulerAngleX) > 12f) handleChallengeSuccess()
+                        "BLINK" -> if ((face.leftEyeOpenProbability ?: 1.0f) < 0.25f) handleChallengeSuccess()
+                        "SMILE" -> if ((face.smilingProbability ?: 0.0f) > 0.70f) handleChallengeSuccess()
+                        "TURN_LEFT" -> if (face.headEulerAngleY > 18f) handleChallengeSuccess()
+                        "TURN_RIGHT" -> if (face.headEulerAngleY < -18f) handleChallengeSuccess()
+                        "NOD_HEAD" -> if (Math.abs(face.headEulerAngleX) > 12f) handleChallengeSuccess()
                     }
                 }
             }
-            .addOnFailureListener { Log.e("KYC", "Face detect fail", it) }
+            .addOnFailureListener { Log.e("KYC", "Face Error", it) }
             .addOnCompleteListener { imageProxy.close() }
     }
 
     private fun processDocumentDNA(image: InputImage, imageProxy: ImageProxy, security: SecurityEngine.SecurityResult) {
-        // Parallel checks for Face-on-Card and Text density
         faceDetector.process(image).addOnSuccessListener { faces ->
             textRecognizer.process(image).addOnSuccessListener { visionText ->
                 val hasPhoto = faces.isNotEmpty() || !docName.lowercase().contains("id")
@@ -243,15 +246,15 @@ class KYCActivity : AppCompatActivity() {
     }
 
     private fun handleChallengeSuccess() {
-        livenessScore += 5
+        livenessScore += 10 
         runOnUiThread {
             binding.progressBar.progress = livenessScore
-            if (livenessScore % 20 == 0) {
+            if (livenessScore % 30 == 0) {
                 performHaptic(40)
                 updateChallenge()
             }
             if (livenessScore >= requiredLiveness) {
-                finishKYC("SELFIE_SUCCESS")
+                takePhoto() 
             }
         }
     }
@@ -292,6 +295,9 @@ class KYCActivity : AppCompatActivity() {
                             SecurityEngine.reset()
                         }
                         saveResult("FRONT_PATH", photoFile.absolutePath)
+                    } else if (mode == "SELFIE") {
+                        saveResult("SELFIE_PATH", photoFile.absolutePath)
+                        finishKYC("SELFIE_SUCCESS")
                     } else {
                         saveResult("BACK_PATH", photoFile.absolutePath)
                         finishKYC("DOCUMENT_SUCCESS")

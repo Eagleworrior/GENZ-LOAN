@@ -32,7 +32,11 @@ let currentUser = {
     pendingLoan: 0,
     lastDisbursementTime: 0,
     history: [],
-    referralCode: "GENZ-" + Math.random().toString(36).substring(2, 6).toUpperCase()
+    referralCode: "GENZ-" + Math.random().toString(36).substring(2, 6).toUpperCase(),
+    kycCompleted: false,
+    kycFront: null,
+    kycBack: null,
+    kycSelfie: null
 };
 
 let globalQualifiedAmount = 0;
@@ -259,7 +263,7 @@ const BANKS = {
     "Zimbabwe": ["CBZ Bank", "CABS", "Stanbic Bank Zimbabwe", "EcoCash"],
     "Botswana": ["First National Bank Botswana", "Standard Chartered Botswana", "Absa Bank Botswana", "Orange Money"],
     "Cameroon": ["Afriland First Bank", "Société Générale Cameroun", "MTN MoMo", "Orange Money"],
-    "Ivory Coast": ["NSIA Banque", "Société Générale Côte d'Ivoire", "Orange Money", "MTN MoMo"],
+    "Ivory Coast": ["NSIA Banque", "Société Générale Côte'Ivoire", "Orange Money", "MTN MoMo"],
     "Morocco": ["Attijariwafa Bank", "Banque Populaire du Maroc", "BMCE Bank"],
     "Algeria": ["Banque Extérieure d'Algérie", "Banque Nationale d'Algérie"],
     "Angola": ["Banco Angolano de Investimentos", "Banco Económico"],
@@ -1037,9 +1041,14 @@ window.onKYCResult = function(result) {
     if (result.status === "DOCUMENT_SUCCESS") {
         currentUser.kycFront = result.frontPath;
         currentUser.kycBack = result.backPath;
-        showToast("Document captured successfully!", "success");
+        currentUser.kycDocType = selectedDoc?.name;
+        saveState();
+        showToast("Document saved securely!", "success");
         showScreen('kyc-liveness-screen');
     } else if (result.status === "SELFIE_SUCCESS") {
+        currentUser.kycSelfie = result.SELFIE_PATH;
+        currentUser.kycCompleted = true;
+        saveState();
         showToast("Identity verified! Highest security cleared.", "success");
         finalizeLoanApplication();
     } else {
@@ -1072,12 +1081,23 @@ function finalizeLoanApplication() {
         accNumber: currentUser.loanFormData['account-number'] || currentUser.phone || currentUser.loanFormData['payout-phone']
     };
 
+    saveState(); // Ensure terms are saved
     renderAgreement();
     showScreen('agreement-screen');
 }
 
 // Override old processLoanApplication
 function processLoanApplication() {
+    if (currentUser.kycCompleted) {
+        finalizeLoanApplication();
+        return;
+    }
+
+    if (currentUser.kycFront) {
+        showScreen('kyc-liveness-screen');
+        return;
+    }
+
     renderDocSelector();
     showScreen('kyc-selector-screen');
 }

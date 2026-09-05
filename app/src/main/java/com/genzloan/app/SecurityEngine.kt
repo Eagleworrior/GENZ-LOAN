@@ -25,9 +25,14 @@ object SecurityEngine {
     private var glareDetectedCount = 0
     private var stabilityFrames = 0
     private var isPaperMode = false
+    private var isSelfieMode = false
 
     fun setPaperMode(enabled: Boolean) {
         isPaperMode = enabled
+    }
+
+    fun setSelfieMode(enabled: Boolean) {
+        isSelfieMode = enabled
     }
 
     /**
@@ -69,8 +74,10 @@ object SecurityEngine {
         val mean = sum.toDouble() / count
         val variance = (sumSq.toDouble() / count) - (mean * mean)
         
-        // 1. HARDENED Texture & Entropy Check (Strictly block blank/empty captures)
-        val hasDetail = contrastEdges > (count * 0.065) // Increased from 0.04 to 6.5% for elite blank wall rejection
+        // 1. HARDENED Texture & Entropy Check
+        // Selfie mode needs lower edge density than text-heavy documents
+        val threshold = if (isSelfieMode) 0.055 else 0.10 
+        val hasDetail = contrastEdges > (count * threshold)
         
         // 2. Sharpness
         val isSharp = variance > 120 
@@ -90,15 +97,18 @@ object SecurityEngine {
         val isStable = stabilityFrames > 5 // Require ~0.35 seconds of stillness
         
         // Physicality Proof requirement
-        val requiredGlare = if (isPaperMode) 2 else 5
+        // Selfies don't usually have "glare" unless wearing glasses, so we rely on face detection in Activity
+        val requiredGlare = if (isSelfieMode) 0 else if (isPaperMode) 2 else 5
         val isPhysical = (glareDetectedCount >= requiredGlare) && !isDigitalScreen && hasDetail
 
+        val objName = if (isSelfieMode) "face" else "document"
+
         val message = when {
-            isDigitalScreen -> "Digital Spoof Detected. Use Physical ID."
-            !hasDetail -> "Align document in the frame."
-            !isSharp -> "Focusing... Hold steady."
+            isDigitalScreen -> "Digital Spoof Detected. Use Real $objName."
+            !hasDetail -> "Align $objName in the frame."
+            !isSharp -> "Improving focus... Hold steady."
             !isStable -> "Stabilizing... Hold steady."
-            !isPhysical -> if (isPaperMode) "Align document clearly." else "Security: Tilt document slowly."
+            !isPhysical && !isSelfieMode -> if (isPaperMode) "Align $objName clearly." else "Security: Tilt $objName slowly."
             else -> "Physical Verification Ready."
         }
 
@@ -117,5 +127,6 @@ object SecurityEngine {
         lastLuminance = -1.0
         stabilityFrames = 0
         isPaperMode = false
+        isSelfieMode = false
     }
 }
