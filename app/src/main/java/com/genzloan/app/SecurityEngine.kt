@@ -8,7 +8,7 @@ import kotlin.math.abs
 
 /**
  * Enterprise-Grade Security Engine for local document and liveness validation.
- * Implements physicality analysis to detect digital screens vs. real cards.
+ * Performs real-time checks for blur, motion, and digital screen artifacts.
  */
 object SecurityEngine {
 
@@ -16,7 +16,7 @@ object SecurityEngine {
         val isSharp: Boolean,
         val isStable: Boolean,
         val isPhysical: Boolean,
-        val hasText: Boolean,
+        val hasDetail: Boolean,
         val message: String,
         val score: Int
     )
@@ -24,9 +24,15 @@ object SecurityEngine {
     private var lastLuminance = -1.0
     private var glareDetectedCount = 0
     private var stabilityFrames = 0
+    private var isPaperMode = false
+
+    fun setPaperMode(enabled: Boolean) {
+        isPaperMode = enabled
+    }
 
     /**
      * Analyzes an image frame for professional security clearance.
+     * Implements strict "Anti-Blank" and "Digital Shield" logic.
      */
     fun analyzeFrame(image: ImageProxy): SecurityResult {
         val plane = image.planes[0]
@@ -36,15 +42,14 @@ object SecurityEngine {
         
         var sum = 0L
         var sumSq = 0L
-        val step = 6 // Higher resolution for high-security analysis
+        val step = 6 // Higher resolution for critical analysis
         var count = 0
         
         var maxLocalLuma = 0
         var minLocalLuma = 255
         
-        // 1. Calculate Statistics & "Noise" (Moire detection)
-        // Digital screens have high-frequency periodicity (moire)
-        var moireSignals = 0
+        // 1. Text Density & Feature Mapping (Anti-Blank)
+        var contrastEdges = 0
         var lastPixel = -1
 
         for (i in 0 until data.size step step) {
@@ -56,9 +61,9 @@ object SecurityEngine {
             if (pixel > maxLocalLuma) maxLocalLuma = pixel
             if (pixel < minLocalLuma) minLocalLuma = pixel
 
-            // Detecting artificial edges (pixel grids)
+            // Detecting sharp edges characteristic of text and documents
             if (lastPixel != -1 && abs(pixel - lastPixel) > 40) {
-                moireSignals++
+                contrastEdges++
             }
             lastPixel = pixel
         }
@@ -66,39 +71,43 @@ object SecurityEngine {
         val mean = sum.toDouble() / count
         val variance = (sumSq.toDouble() / count) - (mean * mean)
         
-        // 2. Physicality Heuristics
-        // A digital screen has very regular grid noise. Physical material has natural texture.
-        val isDigitalScreen = moireSignals > (count * 0.15) && variance > 300
+        // 2. Physicality Checks
+        // Digital screens flicker and have high-frequency periodicity
+        val isDigitalScreen = contrastEdges > (count * 0.16) && variance > 400
         
-        // Specular Glare Detection: Looking for "hotspots" (light reflections)
-        val hasHotspot = (maxLocalLuma - mean) > 100 
+        // Specular Glare (Physical light reflections on plastic/paper)
+        val hasHotspot = (maxLocalLuma - mean) > 110 
         if (hasHotspot) glareDetectedCount++
         
-        // 3. Stability Check (Require 1 second of zero motion)
+        // 3. Stability Check (Require 1 second of perfect stillness)
         val lumaDiff = if (lastLuminance < 0) 0.0 else abs(mean - lastLuminance)
         lastLuminance = mean
+        if (lumaDiff < 0.4) stabilityFrames++ else stabilityFrames = 0
         
-        if (lumaDiff < 0.5) stabilityFrames++ else stabilityFrames = 0
+        val isStable = stabilityFrames > 12 // Require ~1 second of zero motion
+        val isSharp = variance > 160 // High sharpness threshold
+        val hasDetail = contrastEdges > (count * 0.03) // Reject if less than 3% edges (blank surfaces)
         
-        val isStable = stabilityFrames > 12 // Approx 1 second at 12fps analysis
-        val isSharp = variance > 160
-        val isPhysical = glareDetectedCount > 10 && !isDigitalScreen
+        // Dynamic physicality requirement
+        val requiredGlare = if (isPaperMode) 3 else 10 
+        val isPhysical = glareDetectedCount >= requiredGlare && !isDigitalScreen
 
         val message = when {
-            isDigitalScreen -> "Digital Spoof Detected. Use Physical ID."
+            isDigitalScreen -> "Digital Spoof Detected. Use Physical Document."
+            !hasDetail -> "No document detected. Avoid blank surfaces."
             !isSharp -> "Too blurry. Improve lighting."
             !isStable -> "Phone moving. Hold steady."
-            !isPhysical -> "Security: Tilt document slowly to verify material."
-            else -> "Material Verified. Ready."
+            !isPhysical -> if (isPaperMode) "Scan paper document clearly." else "Security: Tilt card to verify material."
+            else -> "Physical Document Verified. Ready."
         }
 
         return SecurityResult(
-            isSharp = isSharp,
+            isSharp = isSharp && hasDetail,
             isStable = isStable,
             isPhysical = isPhysical,
-            hasText = moireSignals > (count * 0.02), // At least some contrast details
+            hasDetail = hasDetail,
             message = message,
-            score = if (isDigitalScreen) 0 else ((variance / 4) + (stabilityFrames * 4)).toInt().coerceIn(0, 100)
+            score = if (isDigitalScreen || !hasDetail) 0 else ((variance / 4) + (stabilityFrames * 3)).toInt().coerceIn(0, 100)
         )
     }
 
@@ -106,5 +115,6 @@ object SecurityEngine {
         glareDetectedCount = 0
         lastLuminance = -1.0
         stabilityFrames = 0
+        isPaperMode = false
     }
 }

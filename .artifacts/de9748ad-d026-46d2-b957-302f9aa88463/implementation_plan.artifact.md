@@ -1,58 +1,55 @@
-# High-Security AI KYC & Cross-Validation Plan
+# KYC Optimization: Dynamic Frames & Smart Thresholds
 
-Implement a professional-grade, multi-stage AI verification system that detects physical material, validates document structure, and cross-references user metadata with local context intelligence.
+Improve the user experience of the verification system by making the capture frame adapt to document shapes and refining security thresholds for smoother, more reliable detection.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Contextual AI**: For documents that don't explicitly list a "Country Name" (like utility bills), the AI will look for "Local Markers" such as specific utility provider names, local addresses, and regional currency symbols to verify the document's origin.
+> **Dynamic Framing**: The capture box will now automatically resize. Government IDs will use a card-shaped frame, while utility bills and statements will use a larger, document-shaped frame.
+
+> [!TIP]
+> **Adaptive Security**: Security checks will now be "Document-Aware." Physicality checks (glare/tilt) will be strict for plastic cards but slightly relaxed for paper documents (like utility bills) to prevent user frustration.
 
 ## Proposed Changes
 
-### 1. Security Intelligence (Android Native)
+### 1. Adaptive UI (Android Native)
 
-#### [MODIFY] `SecurityEngine.kt`
-- **Material Verification (FFT analysis)**: Use Fourier analysis to detect the pixel frequency of digital screens. If a user points at a laptop, the app will show **"Digital Spoof Detected"**.
-- **Strict Motion-Lock**: Require a "Zero Motion" state for 1 second before security analysis begins.
-- **Physicality Proof**: Require a detected light reflection (glare) that shifts position, proving the object is physical plastic/paper and not a static photo.
+#### [MODIFY] [KYCOverlay.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCOverlay.kt)
+- Add `setDocType(type: String)` to adjust the aspect ratio of the capture box.
+- Card documents (Passport, ID, License) -> 1.58:1 ratio.
+- Paper documents (Utility, Bank Statement, Tax) -> 1:1.41 (A4) ratio.
 
-#### [MODIFY] `KYCActivity.kt`
-- **Multi-Stage Matcher**:
-    - **Stage 1 (Identity)**: Token-based name matching. Account "John Doe" matches ID "John Philip Doe" by verifying core name overlap.
-    - **Stage 2 (Geography)**: Scan for country keywords OR regional context markers (e.g., specific city names/utilities for the selected country).
-    - **Stage 3 (Structure)**: Ensure the document type selected (e.g., "Passport") has the correct visual structure (e.g., an MRZ zone).
-- **Liveness Fix**: Re-initialize the CameraX lifecycle on "SELFIE" mode entry to ensure the front camera always starts.
+#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
+- Pass the `docName` to the overlay during initialization.
+- Implement specialized instructions for each category (e.g., "Scanning for Paper Document" vs "Scanning for Plastic Card").
 
 ---
 
-### 2. UI & Navigation (Web Layer)
+### 2. Security Engine Calibration
+
+#### [MODIFY] [SecurityEngine.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/SecurityEngine.kt)
+- **Calibrated Glare**: Reduce the required glare cycles from 10 to 6 for faster verification.
+- **Sharpness Triage**: Slightly lower the variance threshold to 140 (from 160) while maintaining strict text-density checks.
+- **Material Intelligence**: Add a `isPaper` flag to relax light-reflection checks for non-plastic documents.
+
+#### [MODIFY] [KYCActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/KYCActivity.kt)
+- Refine name matching to be case-insensitive and trim extra spaces.
+- If a name is missing, show exactly which name part was not found to help the user.
+
+---
+
+### 3. UX & Feedback
 
 #### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
-- Add the **Neon Blue Home Button** to the top-left header of:
-    - `kyc-selector-screen`
-    - `kyc-guidance-screen`
-    - `kyc-liveness-screen`
-- Ensure consistent spacing and professional neon header alignment.
-
-#### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- Build a **Context Catalog**: Mapping countries to their local markers (e.g., Kenya -> "Nairobi," "KES," "KPLC").
-- Update bridge calls to pass full user metadata (`userName`, `userCountry`).
-
----
-
-### 3. Visual Polish
-- Implement **Glowing Feedback Overlays**:
-    - `RED`: No Document / Fake detected.
-    - `YELLOW`: Scanning / Tilt needed.
-    - `GREEN`: Identity Verified.
+- Ensure the **Home Button** is prominent and correctly aligned on all transition screens.
 
 ## Verification Plan
 
-### The "Fraud Resistance" Test
-1.  **Digital Screen Test**: Point camera at a high-res photo of an ID on a tablet. **Goal**: App must block capture.
-2.  **Wrong Name Test**: Use a real ID with a different name. **Goal**: App must show "Name Mismatch."
-3.  **Blank Paper Test**: Point at a white paper. **Goal**: App must show "Scanning for document..." and never turn green.
+### Manual Verification
+- **Card Test**: Select "National ID." Verify the box is card-shaped. Verify it requires a tilt to turn green.
+- **Page Test**: Select "Bank Statement." Verify the box is taller/larger. Verify it turns green more easily without needing intense glare.
+- **Mismatch Test**: Use an ID with a completely different name. Verify the specific error *"Name [Part] not found"* appears.
 
-### Manual Quality Check
-- Confirm the Home button is present and returns the user to the dashboard correctly.
-- Verify liveness check (blink/smile) triggers 100% of the time.
+### Quality Check
+- Confirm that the capture button alpha transitions smoothly from 0.5 to 1.0.
+- Confirm all neon colors are consistent.

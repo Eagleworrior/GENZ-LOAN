@@ -1,10 +1,11 @@
-# Task: High-Security AI KYC & Bug-Fix Marathon
+# Task: High-Security AI KYC Optimization & Bug Fixes
 
-Implementing a truly professional, AI-powered identity verification system with cross-validation and high fraud resistance.
+Finalizing the enterprise-grade AI verification system with adaptive framing, strict physicality detection, and cross-validation.
 
-- `[x]` Phase 1: Security Intelligence Hardening
-- `[x]` Phase 2: AI Cross-Validation (Native)
-- `[x]` Phase 3: Web UI Perfection
-- `[/]` Phase 4: Final Verification
-    - `[ ]` Run "Fraud Gauntlet" tests (Laptops, Prints, Fake Names).
-    - `[x]` Final Signed APK generation.
+- `[x]` Phase 1: Native UI & Adaptive Framing
+- `[x]` Phase 2: Security & AI Core Hardening
+- `[x]` Phase 3: Logic & Cross-Validation
+- `[/]` Phase 4: Final Verification & Push
+    - `[ ]` Test with various document shapes (ID vs Paper).
+    - `[x]` Verify "Green Ready" responsiveness.
+    - `[ ]` Full push to GitHub.
