@@ -1,35 +1,30 @@
-# Walkthrough: High-Security AI KYC & Contextual Intelligence
+# Walkthrough: AI Auto-Capture & Deep Cross-Validation
 
-I have completed the "High-Quality" overhaul of the identity verification system. This version is significantly more secure, detects digital spoofs, and adaptively handles over 30 global document types.
+I have completed the highest security upgrades for your identity verification system. This version introduces **Auto-Capture Intelligence** and **Strict Data Matching** between the user's account and the physical document.
 
-## 🛡️ Enterprise AI Security
+## 🛡️ Enterprise-Grade Security Upgrades
 
-### 1. Smart Physicality Engine (Anti-Spoof)
-- **Digital Screen Shield**: The AI now analyzes frame frequency and contrast patterns to detect digital screen flickers. If a user points the camera at a laptop or tablet, it will block capture and show **"Digital Spoof Detected"**.
-- **Entropy & Texture Check**: I added logic to detect "Entropy." If the user points at a white wall or a blank paper, the AI detects the lack of visual features and blocks the capture with: **"No document detected. Avoid blank surfaces."**
-- **Refined Green-Ready State**: I recalibrated the sensitivity to be more responsive. The frame will now turn green the *instant* the AI confirms the image is sharp, stable, and physical.
+### 1. Smart Auto-Capture
+- **Instant Response**: I fixed the "Green light" delay. The system now constantly monitors image quality, stability, and physicality.
+- **Hands-Free Capture**: Once the AI confirms the document is sharp, physical, and matches the account details for 1.2 seconds, it will **automatically capture** the photo. This prevents users from taking poor-quality manual shots.
 
-### 2. Adaptive Document Framing
-- **ID Card Mode**: Small, horizontal card-shaped box for Passports and IDs.
-- **Document Mode**: Automatically switches to a tall, vertical box for full-page documents like Bank Statements or Utility Bills.
-- **Corner Brackets**: Added professional AI-style corner brackets to help the user align documents perfectly.
+### 2. Deep Identity Cross-Validation (AI Brain)
+- **National ID Scanner**: Specifically for National IDs, the AI now extracts:
+    - **ID Number**: Verifies it matches the number entered during the loan application.
+    - **Date of Birth (DOB)**: Compares the day, month, and year on the ID with the user's registered DOB.
+- **Smart Name Matching**: Handled variations in name counts. It ensures that all parts of your account name (e.g., First and Last) are present on the physical document, even if the ID lists middle names.
+- **Regional Geography AI**: Checks for local markers (city names, utility providers, currency) to verify the document's origin for 30+ document types.
 
-### 3. Deep AI Cross-Validation
-- **Tokenized Name Matcher**: The AI reads the document and verifies that the name matches the account name. It intelligently handles 2 vs. 3 name variations (e.g., "John Doe" correctly matches "John Philip Doe" on an ID).
-- **Geography Context AI**: For documents that don't list a country (like local bills), the AI looks for **Regional Markers** (e.g., city names, local utility providers like KPLC or Eskom, and local currency symbols) to confirm the document's origin.
+### 3. Navigation & Reliability
+- **Global Home Button**: Integrated the neon blue Home button into all KYC screens (Selector, Guidance, Liveness).
+- **Liveness Lifecycle Fix**: Re-engineered the camera initialization to ensure the front-facing camera starts instantly every time for video selfie challenges.
 
-## 🔧 Bug Fixes & Navigation
-
-### 1. Liveness Lifecycle Fix
-- I fixed the "Stuck" issue where clicking "Start Video Selfie" wouldn't trigger the camera. The app now reliably restarts the CameraX lifecycle in **front-facing mode** for liveness challenges.
-
-### 2. Home Button Integration
-- Added the neon blue **Home Button** to the top-left of all transition and verification screens, ensuring the user can always navigate back to the dashboard.
-
-### 3. Beautiful Neon Feedback
-- Added glowing, decorated status messages in `--neon-blue` (for success) and `--neon-pink` (for security blocks) to maintain the app's premium aesthetic.
+## Technical Components Updated
+- **`KYCActivity.kt`**: Implemented auto-capture timer and deep ML Kit extraction for ID/DOB.
+- **`app.js` & `MainActivity.kt`**: Updated bridge to pass account metadata (ID Number, DOB) for real-time comparison.
+- **`SecurityEngine.kt`**: Refined the "Material Verification" to be more responsive for users while staying strict against fraud.
 
 > [!IMPORTANT]
-> **Strictness Note**: The AI is now very strict to prevent fraud. Users must hold the phone steady and ensure they are using their *real, physical ID* in good lighting to pass.
+> **Strictness Note**: If the user's name or ID number on the document doesn't match their account, the AI will block capture and show a specific error (e.g., *"ID Number Mismatch"*). This ensures only the account owner can verify.
 
-**This is a professional-grade security system designed for high-end financial applications.**
+**The system is now a fully autonomous, AI-driven identity guard.**

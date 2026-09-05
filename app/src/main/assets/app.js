@@ -971,7 +971,19 @@ const COUNTRY_LOCAL_MARKERS = {
 function launchNativeKYC() {
     if (typeof AndroidKYC !== 'undefined') {
         const markers = COUNTRY_LOCAL_MARKERS[currentUser.country] || "Identity,Document";
-        AndroidKYC.startVerification("DOCUMENT", selectedDoc?.name || "", currentUser.name, currentUser.country, markers);
+        // Pass account details for strict AI cross-validation
+        const idNum = currentUser.loanFormData?.['id-number'] || "";
+        const dob = `${currentUser.loanFormData?.['dob-day'] || ""}/${currentUser.loanFormData?.['dob-month'] || ""}/${currentUser.loanFormData?.['dob-year'] || ""}`;
+
+        AndroidKYC.startVerification(
+            "DOCUMENT",
+            selectedDoc?.name || "",
+            currentUser.name,
+            currentUser.country,
+            markers,
+            idNum,
+            dob
+        );
     } else {
         showToast("Secure AI requires the official Android App.", "error");
     }
