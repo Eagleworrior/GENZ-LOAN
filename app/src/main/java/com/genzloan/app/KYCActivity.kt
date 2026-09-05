@@ -65,6 +65,7 @@ class KYCActivity : AppCompatActivity() {
         mode = intent.getStringExtra("MODE") ?: "DOCUMENT"
         docName = intent.getStringExtra("DOC_NAME") ?: ""
         
+        SecurityEngine.reset()
         setupUI()
         startCamera()
 
@@ -188,19 +189,18 @@ class KYCActivity : AppCompatActivity() {
         textRecognizer.process(image)
             .addOnSuccessListener { visionText ->
                 val text = visionText.text.lowercase()
-                // Check for document keywords or general text presence
-                val hasText = text.length > 10
+                val hasText = text.length > 15
                 
                 runOnUiThread {
-                    if (isSharp && hasText) {
-                        binding.textInstruction.text = "Physical Document Verified. Capture Ready."
+                    val security = SecurityEngine.analyzeFrame(imageProxy)
+                    
+                    if (isSharp && hasText && security.isPhysical) {
+                        binding.textInstruction.text = "Highest Security Verified. Capture Ready."
+                        binding.textInstruction.setTextColor(Color.parseColor("#00ff88"))
                         binding.btnCapture.alpha = 1.0f
                         isSecurityPass = true
-                    } else if (!isSharp) {
-                        binding.textInstruction.text = "Too blurry. Move to light."
-                        isSecurityPass = false
                     } else {
-                        binding.textInstruction.text = "Position document inside frame."
+                        binding.textInstruction.setTextColor(Color.WHITE)
                         isSecurityPass = false
                     }
                 }

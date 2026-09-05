@@ -5,13 +5,13 @@ I have completed the development of an enterprise-grade Identity Verification sy
 ## 🛡️ Highest Security Features
 
 ### 1. Physicality Detection (Anti-Spoof)
-- **Digital Screen Shield**: The app now performs real-time frequency analysis to detect digital screens. If a user points the camera at a laptop or monitor, the system flags it as a "Digital Spoof" and blocks capture.
-- **Material Verification**: Using Laplacian variance, the app ensures that the document is a sharp, physical object. It requires the user to hold the phone steady and ensures high-quality light levels before proceeding.
-- **Dynamic Header Matcher**: Integrated **ML Kit Text Recognition**. If a user selects "Passport" but shows a "Utility Bill," the app detects the mismatch and prompts for the correct document.
+- **Digital Screen Shield**: The app performs real-time frequency and contrast analysis to detect digital screens. If a user points the camera at a laptop or monitor, the system flags it.
+- **Glare & Tilt Verification**: To prove the document is a physical card, the app requires a "Material Check." It looks for real light reflections (glare) that shift as the user tilts the document. Capture is **locked** until these physical signals are detected.
+- **Dynamic Text Matcher**: Integrated **ML Kit**. The system verifies that the document contains at least 15 characters of structured text, ensuring it's an actual document and not a blank surface.
 
 ### 2. Guided Video Liveness V2
-- **Action Sequence**: The selfie phase is no longer a static photo. It is a guided video session requiring randomized actions: **Blink**, **Smile**, and **Head Nods**.
-- **Fraud Prevention**: These challenges prevent bypass via printed photos or high-quality masks, ensuring the person is alive and present.
+- **Randomized Challenges**: The system now chooses from **Blink**, **Smile**, and **Head Nod** challenges in a random sequence.
+- **Haptic Milestones**: Added vibration feedback for every successful security step, creating a high-end feel.
 
 ## 🎨 Beautiful & Exhaustive UI
 

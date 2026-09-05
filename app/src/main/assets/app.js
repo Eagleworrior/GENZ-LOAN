@@ -917,18 +917,18 @@ function renderDocSelector(filter = "") {
     Object.keys(DOCUMENT_TYPES).forEach(cat => {
         const filteredDocs = DOCUMENT_TYPES[cat].filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
         if (filteredDocs.length > 0) {
-            // Category Header with glow
+            const catColor = filteredDocs[0].color;
             html += `<div class="doc-category">
-                        <h4 style="color: ${filteredDocs[0].color}; text-shadow: 0 0 10px ${filteredDocs[0].color}">${cat}</h4>`;
+                        <h4 style="color: ${catColor}; text-shadow: 0 0 15px ${catColor}; border-left-color: ${catColor}">${cat}</h4>`;
             filteredDocs.forEach(doc => {
                 const isSelected = selectedDoc?.name === doc.name;
                 html += `
                     <div class="doc-item ${isSelected ? 'selected' : ''}"
                          onclick="selectDoc('${doc.name}', '${cat}')"
-                         style="border-color: ${isSelected ? doc.color : 'rgba(255,255,255,0.1)'}">
-                        <i class="fa-solid ${doc.icon}" style="color: ${doc.color}"></i>
+                         style="${isSelected ? `background: rgba(255,255,255,0.08); border-color: ${doc.color}; box-shadow: 0 0 15px ${doc.color}33;` : ''}">
+                        <i class="fa-solid ${doc.icon}" style="color: ${doc.color}; filter: drop-shadow(0 0 5px ${doc.color})"></i>
                         <span style="color: ${isSelected ? 'white' : 'var(--text-dim)'}">${doc.name}</span>
-                        ${isSelected ? `<i class="fa-solid fa-circle-check" style="color: ${doc.color}; margin-left: auto;"></i>` : ''}
+                        ${isSelected ? `<i class="fa-solid fa-shield-check" style="color: ${doc.color}; margin-left: auto; font-size: 1.2rem;"></i>` : ''}
                     </div>
                 `;
             });
@@ -936,7 +936,7 @@ function renderDocSelector(filter = "") {
         }
     });
 
-    if (!html) html = '<p class="center-text" style="color: var(--text-dim);">No documents found matching your search.</p>';
+    if (!html) html = '<p class="center-text" style="color: var(--neon-pink); padding: 20px;">No matching documents found.</p>';
     container.innerHTML = html;
 }
 
