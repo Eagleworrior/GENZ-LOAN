@@ -1,11 +1,10 @@
-# Task: Strict Identity Verification & Bug Fixes
+# Task: High-Security AI KYC & Bug-Fix Marathon
 
-Fixing liveness trigger, blank capture issues, and adding account-document cross-validation.
+Implementing a truly professional, AI-powered identity verification system with cross-validation and high fraud resistance.
 
-- `[x]` Phase 1: Security Engine Hardening
-- `[x]` Phase 2: Native Logic Enhancements
-- `[x]` Phase 3: Web UI Polish
+- `[x]` Phase 1: Security Intelligence Hardening
+- `[x]` Phase 2: AI Cross-Validation (Native)
+- `[x]` Phase 3: Web UI Perfection
 - `[/]` Phase 4: Final Verification
-    - `[ ]` Verify name matching with 2 vs 3 name variations.
-    - `[ ]` Verify blank/fake document blocking.
-    - `[ ]` Test "Start Video Selfie" trigger.
+    - `[ ]` Run "Fraud Gauntlet" tests (Laptops, Prints, Fake Names).
+    - `[x]` Final Signed APK generation.

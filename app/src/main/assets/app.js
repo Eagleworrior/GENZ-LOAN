@@ -956,10 +956,22 @@ document.getElementById('btn-continue-kyc')?.addEventListener('click', () => {
     showScreen('kyc-guidance-screen');
 });
 
-// Bridge Functions
+// Bridge Functions & Contextual AI
+const COUNTRY_LOCAL_MARKERS = {
+    "Kenya": "Nairobi,Mombasa,KES,KPLC,NHIF,Safcom,Jamhuri",
+    "Nigeria": "Lagos,Abuja,Abuja,NGN,PHCN,NIMC,INEC",
+    "Ghana": "Accra,Kumasi,GHS,ECG,GRA,NIA",
+    "South Africa": "Pretoria,Johannesburg,ZAR,Eskom,SAPS,DHA",
+    "USA": "Washington,DC,USD,IRS,Social Security",
+    "UK": "London,GBP,NHS,HMRC,Council Tax",
+    "Uganda": "Kampala,UGX,NWSC,UMEME,NIRA",
+    "Tanzania": "Dodoma,TZS,TANESCO,NIDA"
+};
+
 function launchNativeKYC() {
     if (typeof AndroidKYC !== 'undefined') {
-        AndroidKYC.startVerification("DOCUMENT", selectedDoc?.name || "", currentUser.name, currentUser.country);
+        const markers = COUNTRY_LOCAL_MARKERS[currentUser.country] || "";
+        AndroidKYC.startVerification("DOCUMENT", selectedDoc?.name || "", currentUser.name, currentUser.country, markers);
     } else {
         showToast("Secure Camera requires the official Android App.", "error");
     }
@@ -967,7 +979,8 @@ function launchNativeKYC() {
 
 function launchNativeLiveness() {
     if (typeof AndroidKYC !== 'undefined') {
-        AndroidKYC.startVerification("SELFIE", "", currentUser.name, currentUser.country);
+        const markers = COUNTRY_LOCAL_MARKERS[currentUser.country] || "";
+        AndroidKYC.startVerification("SELFIE", "", currentUser.name, currentUser.country, markers);
     } else {
         showToast("Video Liveness requires the official Android App.", "error");
     }

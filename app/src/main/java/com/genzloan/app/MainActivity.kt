@@ -41,12 +41,13 @@ class MainActivity : AppCompatActivity() {
 
     inner class KYCBridge {
         @JavascriptInterface
-        fun startVerification(mode: String, docName: String = "", userName: String = "", userCountry: String = "") {
+        fun startVerification(mode: String, docName: String = "", userName: String = "", userCountry: String = "", localMarkers: String = "") {
             val intent = Intent(this@MainActivity, KYCActivity::class.java)
             intent.putExtra("MODE", mode)
             intent.putExtra("DOC_NAME", docName)
             intent.putExtra("USER_NAME", userName)
             intent.putExtra("USER_COUNTRY", userCountry)
+            intent.putExtra("LOCAL_MARKERS", localMarkers) // Comma separated markers e.g. "Nairobi,KES,KPLC"
             kycLauncher.launch(intent)
         }
     }

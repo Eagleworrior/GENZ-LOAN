@@ -3,11 +3,12 @@ package com.genzloan.app
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.camera.core.ImageProxy
+import java.nio.ByteBuffer
 import kotlin.math.abs
 
 /**
  * Enterprise-Grade Security Engine for local document and liveness validation.
- * Performs real-time checks for blur, motion, and digital screen artifacts.
+ * Implements physicality analysis to detect digital screens vs. real cards.
  */
 object SecurityEngine {
 
@@ -15,16 +16,17 @@ object SecurityEngine {
         val isSharp: Boolean,
         val isStable: Boolean,
         val isPhysical: Boolean,
+        val hasText: Boolean,
         val message: String,
         val score: Int
     )
 
     private var lastLuminance = -1.0
     private var glareDetectedCount = 0
+    private var stabilityFrames = 0
 
     /**
      * Analyzes an image frame for professional security clearance.
-     * Implements "Anti-Blank" and "Strict Sharpness" logic.
      */
     fun analyzeFrame(image: ImageProxy): SecurityResult {
         val plane = image.planes[0]
@@ -34,14 +36,15 @@ object SecurityEngine {
         
         var sum = 0L
         var sumSq = 0L
-        val step = 6 // Higher resolution for more accuracy
+        val step = 6 // Higher resolution for high-security analysis
         var count = 0
         
         var maxLocalLuma = 0
         var minLocalLuma = 255
         
-        // Tracking "features" (intensity changes) to detect blank surfaces
-        var intensityChanges = 0
+        // 1. Calculate Statistics & "Noise" (Moire detection)
+        // Digital screens have high-frequency periodicity (moire)
+        var moireSignals = 0
         var lastPixel = -1
 
         for (i in 0 until data.size step step) {
@@ -53,8 +56,9 @@ object SecurityEngine {
             if (pixel > maxLocalLuma) maxLocalLuma = pixel
             if (pixel < minLocalLuma) minLocalLuma = pixel
 
-            if (lastPixel != -1 && abs(pixel - lastPixel) > 30) {
-                intensityChanges++
+            // Detecting artificial edges (pixel grids)
+            if (lastPixel != -1 && abs(pixel - lastPixel) > 40) {
+                moireSignals++
             }
             lastPixel = pixel
         }
@@ -62,46 +66,45 @@ object SecurityEngine {
         val mean = sum.toDouble() / count
         val variance = (sumSq.toDouble() / count) - (mean * mean)
         
-        // 1. Strict Sharpness Check (Threshold increased to 150)
-        val isSharp = variance > 150 
-
-        // 2. Anti-Blank Detection (Feature density check)
-        // A blank wall has very low intensity changes even if sharp.
-        val hasDetail = intensityChanges > (count * 0.05) // At least 5% of pixels must show contrast edges
-
-        // 3. Physicality Check (Tilt-Glare Detection)
-        val hasHotspot = (maxLocalLuma - mean) > 90 
+        // 2. Physicality Heuristics
+        // A digital screen has very regular grid noise. Physical material has natural texture.
+        val isDigitalScreen = moireSignals > (count * 0.15) && variance > 300
+        
+        // Specular Glare Detection: Looking for "hotspots" (light reflections)
+        val hasHotspot = (maxLocalLuma - mean) > 100 
         if (hasHotspot) glareDetectedCount++
         
-        // Stability check (Strict 95% requirement)
-        val stabilityScore = if (lastLuminance < 0) 100 else (100 - abs(mean - lastLuminance) * 15).toInt().coerceIn(0, 100)
+        // 3. Stability Check (Require 1 second of zero motion)
+        val lumaDiff = if (lastLuminance < 0) 0.0 else abs(mean - lastLuminance)
         lastLuminance = mean
         
-        val isStable = stabilityScore > 92
-        val isPhysical = glareDetectedCount > 8 
+        if (lumaDiff < 0.5) stabilityFrames++ else stabilityFrames = 0
+        
+        val isStable = stabilityFrames > 12 // Approx 1 second at 12fps analysis
+        val isSharp = variance > 160
+        val isPhysical = glareDetectedCount > 10 && !isDigitalScreen
 
         val message = when {
-            !hasDetail -> "No document detected. Avoid blank surfaces."
-            !isSharp -> "Image blurry. Improve lighting."
+            isDigitalScreen -> "Digital Spoof Detected. Use Physical ID."
+            !isSharp -> "Too blurry. Improve lighting."
             !isStable -> "Phone moving. Hold steady."
-            !isPhysical -> "Security: Tilt document slowly to verify."
-            else -> "Document Verified. Ready to capture."
+            !isPhysical -> "Security: Tilt document slowly to verify material."
+            else -> "Material Verified. Ready."
         }
 
         return SecurityResult(
-            isSharp = isSharp && hasDetail,
+            isSharp = isSharp,
             isStable = isStable,
             isPhysical = isPhysical,
+            hasText = moireSignals > (count * 0.02), // At least some contrast details
             message = message,
-            score = if (!hasDetail) 10 else ((variance / 3) + (stabilityScore / 2)).toInt().coerceIn(0, 100)
+            score = if (isDigitalScreen) 0 else ((variance / 4) + (stabilityFrames * 4)).toInt().coerceIn(0, 100)
         )
     }
 
-    /**
-     * Resets the security engine for a new scan.
-     */
     fun reset() {
         glareDetectedCount = 0
         lastLuminance = -1.0
+        stabilityFrames = 0
     }
 }

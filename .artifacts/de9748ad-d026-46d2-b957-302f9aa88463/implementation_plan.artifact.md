@@ -1,54 +1,58 @@
-# Strict Identity Verification & Cross-Validation Plan
+# High-Security AI KYC & Cross-Validation Plan
 
-Address bugs in the KYC flow and implement high-security cross-validation between user account data and physical documents.
+Implement a professional-grade, multi-stage AI verification system that detects physical material, validates document structure, and cross-references user metadata with local context intelligence.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Strict Verification**: The app will now block any document that doesn't contain the user's name or doesn't match the selected document type/country. This is much more restrictive and may require better lighting from the user.
+> **Contextual AI**: For documents that don't explicitly list a "Country Name" (like utility bills), the AI will look for "Local Markers" such as specific utility provider names, local addresses, and regional currency symbols to verify the document's origin.
 
 ## Proposed Changes
 
-### 1. Security & Intelligence (Android Native)
+### 1. Security Intelligence (Android Native)
 
 #### [MODIFY] `SecurityEngine.kt`
-- **Strict Blank Detection**: Increase the variance threshold and implement a "text density" check.
-- **Enhanced Physicality**: Require more "glare cycles" to confirm physical material.
-- **Anti-Blur V2**: Block capture if the image stability score is below 95%.
+- **Material Verification (FFT analysis)**: Use Fourier analysis to detect the pixel frequency of digital screens. If a user points at a laptop, the app will show **"Digital Spoof Detected"**.
+- **Strict Motion-Lock**: Require a "Zero Motion" state for 1 second before security analysis begins.
+- **Physicality Proof**: Require a detected light reflection (glare) that shifts position, proving the object is physical plastic/paper and not a static photo.
 
 #### [MODIFY] `KYCActivity.kt`
-- **Account Cross-Validation**: Receive `USER_NAME` and `USER_COUNTRY` from the bridge.
-- **Name Matching Engine**:
-    - Verify that the account names are present on the document.
-    - Support "subset matching" (e.g., if account is "John Doe" and ID is "John Philip Doe", it passes).
-- **Country Enforcement**: Verify keywords related to the selected country are present on the document.
-- **Liveness Fix**: Ensure "SELFIE" mode correctly initializes and transitions.
-
-#### [MODIFY] `MainActivity.kt`
-- Update `KYCBridge` to pass `userName` and `userCountry` to `KYCActivity`.
+- **Multi-Stage Matcher**:
+    - **Stage 1 (Identity)**: Token-based name matching. Account "John Doe" matches ID "John Philip Doe" by verifying core name overlap.
+    - **Stage 2 (Geography)**: Scan for country keywords OR regional context markers (e.g., specific city names/utilities for the selected country).
+    - **Stage 3 (Structure)**: Ensure the document type selected (e.g., "Passport") has the correct visual structure (e.g., an MRZ zone).
+- **Liveness Fix**: Re-initialize the CameraX lifecycle on "SELFIE" mode entry to ensure the front camera always starts.
 
 ---
 
-### 2. UI & User Experience (Web Layer)
+### 2. UI & Navigation (Web Layer)
 
-#### [MODIFY] `index.html`
-- Add **Home Button** to the top-left of:
+#### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
+- Add the **Neon Blue Home Button** to the top-left header of:
     - `kyc-selector-screen`
     - `kyc-guidance-screen`
     - `kyc-liveness-screen`
-- Ensure consistent neon styling for these buttons.
+- Ensure consistent spacing and professional neon header alignment.
 
-#### [MODIFY] `app.js`
-- Update `launchNativeKYC` and `launchNativeLiveness` to pass `currentUser.name` and `currentUser.country`.
-- Fix the logic for the "Start Video Selfie" button to ensure it triggers correctly.
+#### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
+- Build a **Context Catalog**: Mapping countries to their local markers (e.g., Kenya -> "Nairobi," "KES," "KPLC").
+- Update bridge calls to pass full user metadata (`userName`, `userCountry`).
+
+---
+
+### 3. Visual Polish
+- Implement **Glowing Feedback Overlays**:
+    - `RED`: No Document / Fake detected.
+    - `YELLOW`: Scanning / Tilt needed.
+    - `GREEN`: Identity Verified.
 
 ## Verification Plan
 
-### Automated Security Tests
-- **Wrong Name Test**: Point at an ID with a different name. **Goal**: App must show "Name Mismatch" and block capture.
-- **Blank Image Test**: Point at a white paper. **Goal**: App must show "No document detected" and block capture.
-- **Liveness Trigger Test**: Click "Start Video Selfie". **Goal**: Native camera must launch in front-facing mode.
+### The "Fraud Resistance" Test
+1.  **Digital Screen Test**: Point camera at a high-res photo of an ID on a tablet. **Goal**: App must block capture.
+2.  **Wrong Name Test**: Use a real ID with a different name. **Goal**: App must show "Name Mismatch."
+3.  **Blank Paper Test**: Point at a white paper. **Goal**: App must show "Scanning for document..." and never turn green.
 
 ### Manual Quality Check
-- Verify the "Home" button is present and functional on all new KYC screens.
-- Test the "3 names on ID vs 2 names on account" scenario.
+- Confirm the Home button is present and returns the user to the dashboard correctly.
+- Verify liveness check (blink/smile) triggers 100% of the time.
