@@ -41,9 +41,10 @@ class MainActivity : AppCompatActivity() {
 
     inner class KYCBridge {
         @JavascriptInterface
-        fun startVerification(mode: String) {
+        fun startVerification(mode: String, docName: String = "") {
             val intent = Intent(this@MainActivity, KYCActivity::class.java)
             intent.putExtra("MODE", mode)
+            intent.putExtra("DOC_NAME", docName)
             kycLauncher.launch(intent)
         }
     }

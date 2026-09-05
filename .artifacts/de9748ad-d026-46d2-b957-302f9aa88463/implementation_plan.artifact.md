@@ -1,69 +1,58 @@
-# High-Security Identity Verification Plan (Liveness & Global Docs)
+# High-Security KYC & Global Document Intelligence Plan
 
-Upgrade the identity verification system from a basic face scan to a production-grade KYC (Know Your Customer) module featuring guided video selfie liveness, global document selection, and native CameraX security.
+Transform the GenZ Loan verification into a professional-grade, anti-fraud system that detects real physical documents vs. digital spoofs, implements guided video liveness, and supports a comprehensive global document catalog with a beautiful neon UI.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Native Transition**: This upgrade moves the actual capture logic from the browser (WebView) to Native Android code. This ensures "highest security" as requested, allowing us to use **Google ML Kit** for real-time liveness checks (blink/smile detection) that cannot be easily spoofed.
+> **No API Keys Required**: This entire system will run locally on the user's device using **OpenCV** and **ML Kit**. This ensures high privacy and zero recurring costs.
 
-> [!WARNING]
-> **Backend Integration**: This plan implements the **Client-Side** (App) logic and UI. Full authenticity verification (checking if a document is 100% real) typically requires a specialized backend service (like Onfido or Jumio) as recommended in your request. I will provide the structure to connect to such a service.
+> [!CAUTION]
+> **Hardware Requirements**: The anti-spoofing checks (moire detection) require a decent camera. Older devices might struggle with real-time FFT analysis. I will implement a fallback for stability.
 
 ## Proposed Changes
 
-### 1. Android Native Layer (Security Foundation)
+### 1. Android Security Core (The "Brain")
 
 #### [MODIFY] [build.gradle](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/build.gradle)
-- Add **CameraX** dependencies for high-performance capture.
-- Add **Google ML Kit Face Detection** for real-time liveness (blink/smile detection).
-- Add **Gson** for structured communication between JS and Kotlin.
+- Add **OpenCV Android SDK** for advanced image processing (Screen & Glare detection).
+- Add **ML Kit Text Recognition** for real-time document header verification.
 
-#### [MODIFY] [AndroidManifest.xml](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/AndroidManifest.xml)
-- Add `RECORD_AUDIO` permission for video selfie.
-- Register a new `KYCActivity` to handle the secure camera experience.
+#### [NEW] `SecurityEngine.kt`
+- **Moire Shield**: Uses Fourier Transform logic to detect the invisible flickering of digital screens (blocking photos of laptops/tablets).
+- **Specular Guard**: Detects real-world light reflections (glare). The app will ask the user to "Tilt the card" to confirm it's a physical object.
+- **Blur & Motion Check**: Blocks capture if the phone is shaking or the lens is dirty.
 
-#### [NEW] `KYCActivity.kt`
-- Implement CameraX preview with a circular face overlay and rectangular document guide.
-- Integrate ML Kit to monitor for "Liveness Challenges" (e.g., "Blink now", "Smile").
-- Capture high-resolution images/videos and save them securely for upload.
-
-#### [MODIFY] [MainActivity.kt](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/java/com/genzloan/app/MainActivity.kt)
-- Add a `JavascriptInterface` bridge (`window.AndroidKYC`) to allow the website to launch the native camera and receive results.
+#### [MODIFY] `KYCActivity.kt`
+- **Real-Time Guard**: The "Capture" button will be locked behind a "Security Pass" state.
+- **Header Matcher**: Before capturing, it will verify that a "Passport" actually says "Passport" in the frame.
+- **Video Selfie V2**: Guided 10-second session with randomized challenges (Blink, Smile, Turn Head).
 
 ---
 
-### 2. Frontend UI Layer (User Experience)
+### 2. Global Document UI (The "Beautiful" Look)
 
-#### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html)
-- **Document Selector Screen**: Add a searchable country selector and a categorized list of all 30+ document types (Passport, ID, Utility Bills, etc.).
-- **Guidance Screen**: Add a per-country capture guide (e.g., "Capture the MRZ on the bottom of your passport").
-- **Liveness Challenge UI**: Dynamic overlays for the video selfie phase.
-
-#### [MODIFY] [style.css](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/style.css)
-- Advanced scanning overlays (corner guides, pulse animations).
-- Searchable dropdown styles for the document catalog.
-- "Challenge Prompts" styling for liveness checks.
+#### [MODIFY] [index.html](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/index.html) & [style.css](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/style.css)
+- **Categorized Document Hub**: A stunning, searchable UI for 30+ document types.
+- **Neon-Themed Names**: Each document category will have unique neon glow accents (e.g., Government IDs in `--neon-blue`, Financial in `--neon-yellow`, etc.).
+- **Interactive Guides**: SVG animations showing how to "Tilt your document" and "Blink slowly."
 
 #### [MODIFY] [app.js](file:///C:/Users/EAGLE/StudioProjects/GENZ-LOAN/app/src/main/assets/app.js)
-- Implement the state machine for the new KYC flow: `Selector -> Guidance -> Native Capture -> Processing -> Result`.
-- Handle the data payload from the Native Bridge and prepare it for server upload.
+- **Massive Catalog Data**: Integrated mapping of all document types provided (Military IDs, Tenancy Agreements, etc.).
+- **Dynamic Guidance**: Custom instructions for every single document type (e.g., "Ensure signatures are visible on page 3").
 
 ---
 
-### 3. Feature Mapping (Based on Your List)
-- **Point 1-2**: Searchable catalog and localized guidance implemented in `index.html`.
-- **Point 3-5**: High-quality capture and MRZ reading handled by **CameraX** and native processing.
-- **Point 7-8**: **Liveness Challenges** (blink/smile) and Face Matching implemented via ML Kit.
-- **Point 13-15**: Secure storage and retry flows integrated into the app logic.
+### 3. Verification & Liveness
+
+- **Face-Document Match**: Extract the photo from the captured ID and compare it *on-device* against the video selfie frames using ML Kit face embeddings.
 
 ## Verification Plan
 
-### Automated Tests
-- Validate that the Native Bridge responds correctly to `window.AndroidKYC.startVerification()`.
-- Check if ML Kit successfully detects faces in various lighting conditions.
+### Automated Security Tests
+- **Screen Spoof Test**: Point the camera at a 4K monitor showing an ID. The app must display "Digital Screen Detected" and block capture.
+- **Static Face Test**: Hold a photo of a person's face. The liveness check must fail because it detects no blink/smile "life signals."
 
-### Manual Verification
-- **Challenge Test**: Verify that the video selfie only proceeds when the user actually blinks or smiles as requested.
-- **Document Test**: Verify that the correct capture guide appears for "Passport" vs "Utility Bill".
-- **Integration Test**: Ensure the final verification result is correctly passed back to the dashboard.
+### Manual Quality Check
+- Verify that document names are "beautifully colored" as requested.
+- Ensure the "Highest Security" message is prominently displayed to build user trust.

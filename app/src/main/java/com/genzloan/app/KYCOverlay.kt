@@ -20,9 +20,20 @@ class KYCOverlay(context: Context, attrs: AttributeSet?) : View(context, attrs) 
     }
 
     private var mode = "DOCUMENT"
+    private var status = "RED" // RED, YELLOW, GREEN
 
     fun setMode(mode: String) {
         this.mode = mode
+        invalidate()
+    }
+
+    fun setStatus(status: String) {
+        this.status = status
+        borderPaint.color = when(status) {
+            "GREEN" -> Color.parseColor("#00ff88")
+            "YELLOW" -> Color.parseColor("#f3ff00")
+            else -> Color.parseColor("#ff00ff")
+        }
         invalidate()
     }
 
@@ -37,7 +48,7 @@ class KYCOverlay(context: Context, attrs: AttributeSet?) : View(context, attrs) 
 
         if (mode == "SELFIE") {
             // Draw Circle for face
-            val radius = width * 0.35f
+            val radius = width * 0.38f
             val centerX = width / 2
             val centerY = height / 2.2f
             
@@ -45,20 +56,27 @@ class KYCOverlay(context: Context, attrs: AttributeSet?) : View(context, attrs) 
                 addCircle(centerX, centerY, radius, Path.Direction.CW)
             }
             canvas.drawPath(path, Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) })
+            
+            // Draw dotted/scanning ring
             canvas.drawCircle(centerX, centerY, radius, borderPaint)
+            
+            // Add a "Secure scanning" pulse if yellow
+            if (status == "YELLOW") {
+                val pulsePaint = Paint(borderPaint).apply { alpha = 100; strokeWidth = 2f }
+                canvas.drawCircle(centerX, centerY, radius + 20f, pulsePaint)
+            }
         } else {
             // Draw Rectangle for document
-            val rectWidth = width * 0.85f
-            val rectHeight = rectWidth * 0.63f // ID Card ratio
+            val rectWidth = width * 0.90f
+            val rectHeight = rectWidth * 0.64f
             val left = (width - rectWidth) / 2
             val top = (height - rectHeight) / 2.2f
             val rect = RectF(left, top, left + rectWidth, top + rectHeight)
             
             canvas.drawRect(rect, Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) })
-            canvas.drawRoundRect(rect, 20f, 20f, borderPaint)
+            canvas.drawRoundRect(rect, 30f, 30f, borderPaint)
         }
         
-        // Important: Hardware acceleration might need to be enabled for CLEAR mode to work correctly on some versions
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 }

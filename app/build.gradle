@@ -63,6 +63,9 @@ dependencies {
 
     // ML Kit Face Detection
     implementation 'com.google.mlkit:face-detection:16.1.7'
+    
+    // ML Kit Text Recognition
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
 
     // JSON Utility
     implementation 'com.google.code.gson:gson:2.11.0'

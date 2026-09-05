@@ -876,30 +876,34 @@ document.getElementById('btn-apply').addEventListener('click', () => {
 });
 
 const DOCUMENT_TYPES = {
-    "Government ID": [
-        { name: "Passport", icon: "fa-passport", guidance: "Capture the biodata page. Ensure MRZ (bottom text) is clear." },
-        { name: "National ID", icon: "fa-id-card", guidance: "Capture the front side first. Ensure all corners are visible." },
-        { name: "Driver's Licence", icon: "fa-id-badge", guidance: "Capture the photo side. Ensure text is readable." },
-        { name: "Residence Permit", icon: "fa-id-card-clip", guidance: "Capture the front side showing your photo and expiry." },
-        { name: "Voter Registration Card", icon: "fa-check-to-slot", guidance: "Ensure the registration number and photo are sharp." },
-        { name: "Social Security Card", icon: "fa-shield-halved", guidance: "Capture the front of your SSN/NHIF card." }
+    "Government Identity": [
+        { name: "Passport", icon: "fa-passport", color: "var(--neon-blue)", guidance: "Capture the biodata page. Ensure MRZ (bottom text) is clear." },
+        { name: "National ID Card", icon: "fa-id-card", color: "var(--neon-blue)", guidance: "Capture the front side first. Ensure all corners are visible." },
+        { name: "Driver's Licence", icon: "fa-id-badge", color: "var(--neon-blue)", guidance: "Capture the photo side. Ensure text is readable." },
+        { name: "Residence Permit", icon: "fa-id-card-clip", color: "var(--neon-blue)", guidance: "Capture the front side showing your photo and expiry." },
+        { name: "Alien Card", icon: "fa-user-shield", color: "var(--neon-blue)", guidance: "Capture the main photo and work permit details." },
+        { name: "Voter Registration Card", icon: "fa-check-to-slot", color: "var(--neon-blue)", guidance: "Ensure the registration number and photo are sharp." },
+        { name: "Social Security Card", icon: "fa-shield-halved", color: "var(--neon-blue)", guidance: "Capture the front of your SSN/NHIF card." }
     ],
     "Proof of Address": [
-        { name: "Utility Bill", icon: "fa-file-invoice-dollar", guidance: "Must be from last 3 months. Ensure name and address match your profile." },
-        { name: "Bank Statement", icon: "fa-file-lines", guidance: "Recent statement (last 30 days) showing residential address." },
-        { name: "Tenancy Agreement", icon: "fa-house-chimney-user", guidance: "Official signed lease document. Capture the address and signatures page." },
-        { name: "Payslip", icon: "fa-money-check-dollar", guidance: "Recent employer payslip showing your home address." }
+        { name: "Utility Bill", icon: "fa-file-invoice-dollar", color: "var(--neon-pink)", guidance: "Must be from last 3 months. Ensure name and address match your profile." },
+        { name: "Bank Statement", icon: "fa-file-lines", color: "var(--neon-pink)", guidance: "Recent statement (last 30 days) showing residential address." },
+        { name: "Tax Document", icon: "fa-file-signature", color: "var(--neon-pink)", guidance: "Official government tax document showing your Tax ID." },
+        { name: "Tenancy Agreement", icon: "fa-house-chimney-user", color: "var(--neon-pink)", guidance: "Official signed lease document. Capture the address and signatures page." },
+        { name: "Payslip", icon: "fa-money-check-dollar", color: "var(--neon-pink)", guidance: "Recent employer payslip showing your home address." }
     ],
     "Financial & Business": [
-        { name: "Credit Card Statement", icon: "fa-credit-card", guidance: "Recent statement showing your billing address." },
-        { name: "Tax Assessment", icon: "fa-file-signature", guidance: "Official government tax document showing your Tax ID." },
-        { name: "Certificate of Incorporation", icon: "fa-building-shield", guidance: "For business accounts. Capture the registration certificate." },
-        { name: "Business Bank Statement", icon: "fa-landmark-flag", guidance: "Last 3 months of business transaction history." }
+        { name: "Credit Card Statement", icon: "fa-credit-card", color: "var(--neon-yellow)", guidance: "Recent statement showing your billing address." },
+        { name: "Mobile Money Statement", icon: "fa-mobile-screen-button", color: "var(--neon-yellow)", guidance: "Official statement from your mobile service provider." },
+        { name: "Certificate of Incorporation", icon: "fa-building-shield", color: "var(--neon-yellow)", guidance: "For business accounts. Capture the registration certificate." },
+        { name: "Tax Registration (VAT)", icon: "fa-receipt", color: "var(--neon-yellow)", guidance: "Capture the VAT certificate showing the PIN/Tax number." },
+        { name: "Business Bank Statement", icon: "fa-landmark-flag", color: "var(--neon-yellow)", guidance: "Last 3 months of business transaction history." }
     ],
-    "Other Identity Proofs": [
-        { name: "Student ID", icon: "fa-user-graduate", guidance: "Current university or college ID showing expiry date." },
-        { name: "National Service Card", icon: "fa-person-military-pointing", guidance: "Official government service or military identification." },
-        { name: "Health Insurance Card", icon: "fa-heart-pulse", guidance: "Card must include your photo and official issuer logo." }
+    "Other Accepted Proofs": [
+        { name: "Military ID", icon: "fa-person-military-pointing", color: "var(--neon-orange)", guidance: "Official government service identification." },
+        { name: "National Service Card", icon: "fa-flag", color: "var(--neon-orange)", guidance: "Service or NYSC identification documents." },
+        { name: "Student ID", icon: "fa-user-graduate", color: "var(--neon-orange)", guidance: "Current university ID with official institution letter." },
+        { name: "Health Insurance Card", icon: "fa-heart-pulse", color: "var(--neon-orange)", guidance: "Card must include your photo and official issuer logo." }
     ]
 };
 
@@ -913,12 +917,18 @@ function renderDocSelector(filter = "") {
     Object.keys(DOCUMENT_TYPES).forEach(cat => {
         const filteredDocs = DOCUMENT_TYPES[cat].filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
         if (filteredDocs.length > 0) {
-            html += `<div class="doc-category"><h4>${cat}</h4>`;
+            // Category Header with glow
+            html += `<div class="doc-category">
+                        <h4 style="color: ${filteredDocs[0].color}; text-shadow: 0 0 10px ${filteredDocs[0].color}">${cat}</h4>`;
             filteredDocs.forEach(doc => {
+                const isSelected = selectedDoc?.name === doc.name;
                 html += `
-                    <div class="doc-item ${selectedDoc?.name === doc.name ? 'selected' : ''}" onclick="selectDoc('${doc.name}', '${cat}')">
-                        <i class="fa-solid ${doc.icon}"></i>
-                        <span>${doc.name}</span>
+                    <div class="doc-item ${isSelected ? 'selected' : ''}"
+                         onclick="selectDoc('${doc.name}', '${cat}')"
+                         style="border-color: ${isSelected ? doc.color : 'rgba(255,255,255,0.1)'}">
+                        <i class="fa-solid ${doc.icon}" style="color: ${doc.color}"></i>
+                        <span style="color: ${isSelected ? 'white' : 'var(--text-dim)'}">${doc.name}</span>
+                        ${isSelected ? `<i class="fa-solid fa-circle-check" style="color: ${doc.color}; margin-left: auto;"></i>` : ''}
                     </div>
                 `;
             });
@@ -926,7 +936,7 @@ function renderDocSelector(filter = "") {
         }
     });
 
-    if (!html) html = '<p class="center-text" style="color: var(--text-dim);">No documents found.</p>';
+    if (!html) html = '<p class="center-text" style="color: var(--text-dim);">No documents found matching your search.</p>';
     container.innerHTML = html;
 }
 
@@ -949,7 +959,7 @@ document.getElementById('btn-continue-kyc')?.addEventListener('click', () => {
 // Bridge Functions
 function launchNativeKYC() {
     if (typeof AndroidKYC !== 'undefined') {
-        AndroidKYC.startVerification("DOCUMENT");
+        AndroidKYC.startVerification("DOCUMENT", selectedDoc?.name || "");
     } else {
         showToast("Secure Camera requires the official Android App.", "error");
     }

@@ -508,16 +508,20 @@
                 <div class="nav-stack">
                     <button class="icon-btn home-btn" onclick="showScreen('dashboard-screen')" style="color: var(--neon-blue);"><i class="fa-solid fa-house"></i></button>
                 </div>
-                <h2>Identity Verification</h2>
+                <h2>Security Hub</h2>
             </header>
             <div class="card glass">
-                <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 20px;">
-                    Choose the document you'll use. This helps us verify your identity quickly and securely.
+                <div class="secure-badge">
+                    <i class="fa-solid fa-shield-check"></i> Highest Security Active
+                </div>
+                <h3 style="color: white; margin-bottom: 5px;">Verify Identity</h3>
+                <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 20px;">
+                    Select your document type to begin the encrypted verification process.
                 </p>
 
                 <div class="input-group">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="doc-search" placeholder="Search document type...">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--neon-blue)"></i>
+                    <input type="text" id="doc-search" placeholder="Search (e.g. Passport, ID...)">
                 </div>
 
                 <div id="doc-categories" class="doc-list-container">
@@ -525,7 +529,7 @@
                 </div>
 
                 <button id="btn-continue-kyc" class="btn primary glow" style="margin-top: 20px;" disabled>
-                    Continue <i class="fa-solid fa-arrow-right"></i>
+                    Proceed to Guide <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
         </div>
